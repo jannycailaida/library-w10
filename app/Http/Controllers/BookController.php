@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Author;
 use App\Models\Book;
+use App\Models\Member;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Gate;
 
@@ -38,7 +39,14 @@ class BookController extends Controller
 
         $books = $query->orderBy('title')->paginate(12)->withQueryString();
 
-        return view('books.index', compact('books', 'search', 'filter'));
+        $totalBooks = Book::count();
+        $availableCount = Book::where('is_reference', false)
+            ->whereDoesntHave('members', fn ($q) => $q->whereNull('returned_at'))
+            ->count();
+        $referenceCount = Book::where('is_reference', true)->count();
+        $totalMembers = Member::count();
+
+        return view('books.index', compact('books', 'search', 'filter', 'totalBooks', 'availableCount', 'referenceCount', 'totalMembers'));
     }
 
     /**
