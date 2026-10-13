@@ -55,15 +55,15 @@
                     <div class="flex items-center justify-between z-10 relative">
                         @if ($book->is_reference)
                             <span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-bold bg-amber-400 text-amber-950 shadow-md">
-                                🔒 Reference Material
+                                🔒 Reference
                             </span>
                         @elseif ($isBorrowed)
                             <span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-bold bg-rose-500 text-white shadow-md">
-                                ⏳ Currently on Loan
+                                ⏳ Borrowed
                             </span>
                         @else
                             <span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-bold bg-emerald-400 text-emerald-950 shadow-md">
-                                ✓ Available for Borrowing
+                                ✓ Available
                             </span>
                         @endif
 

@@ -497,24 +497,38 @@
                                         <form method="POST" action="{{ route('books.borrow', $book) }}">
                                             @csrf
                                             <button type="submit"
-                                                    class="inline-flex items-center space-x-1 px-3.5 py-1.5 bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-700 hover:to-teal-700 text-white text-xs font-bold rounded-xl shadow-sm transition transform active:scale-95">
+                                                    class="inline-flex items-center space-x-1.5 px-4 py-1.5 bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-700 hover:to-teal-700 text-white text-xs font-bold rounded-xl shadow-md shadow-emerald-600/20 transition transform active:scale-95">
                                                 <span>📖</span>
                                                 <span>Borrow</span>
                                             </button>
                                         </form>
                                     @elseif ($book->is_reference)
-                                        <span class="text-[11px] text-amber-600 font-semibold bg-amber-50 px-2 py-0.5 rounded-md">
-                                            Library use only
+                                        <span class="inline-flex items-center space-x-1 px-3 py-1.5 text-xs font-bold bg-amber-100 text-amber-900 border border-amber-300 rounded-xl">
+                                            <span>🔒</span>
+                                            <span>Reference</span>
                                         </span>
                                     @elseif ($isBorrowed)
-                                        <span class="text-[11px] text-rose-500 font-semibold bg-rose-50 px-2 py-0.5 rounded-md">
-                                            On Loan
+                                        <span class="inline-flex items-center space-x-1 px-3 py-1.5 text-xs font-bold bg-rose-100 text-rose-800 border border-rose-300 rounded-xl">
+                                            <span>⏳</span>
+                                            <span>Borrowed</span>
                                         </span>
                                     @endif
                                 @else
-                                    <a href="{{ route('login') }}" class="text-[11px] font-semibold text-gray-400 hover:text-indigo-600">
-                                        Sign in to borrow
-                                    </a>
+                                    @if ($book->is_reference)
+                                        <span class="inline-flex items-center space-x-1 px-3 py-1.5 text-xs font-bold bg-amber-100 text-amber-900 border border-amber-300 rounded-xl">
+                                            <span>🔒</span>
+                                            <span>Reference</span>
+                                        </span>
+                                    @elseif ($isBorrowed)
+                                        <span class="inline-flex items-center space-x-1 px-3 py-1.5 text-xs font-bold bg-rose-100 text-rose-800 border border-rose-300 rounded-xl">
+                                            <span>⏳</span>
+                                            <span>Borrowed</span>
+                                        </span>
+                                    @else
+                                        <a href="{{ route('login') }}" class="inline-flex items-center space-x-1 px-3.5 py-1.5 text-xs font-bold text-indigo-700 bg-indigo-50 hover:bg-indigo-100 border border-indigo-200 rounded-xl transition">
+                                            <span>Sign In to Borrow</span>
+                                        </a>
+                                    @endif
                                 @endauth
                             </div>
                         </div>
@@ -583,18 +597,18 @@
                                 </span>
 
                                 <template x-if="quickBook && quickBook.is_reference">
-                                    <span class="text-xs font-bold bg-amber-100 text-amber-800 px-2.5 py-1 rounded-lg">
-                                        🔒 Reference Only
+                                    <span class="text-xs font-bold bg-amber-100 text-amber-900 border border-amber-300 px-2.5 py-1 rounded-lg">
+                                        🔒 Reference
                                     </span>
                                 </template>
                                 <template x-if="quickBook && !quickBook.is_reference && quickBook.is_borrowed">
-                                    <span class="text-xs font-bold bg-rose-100 text-rose-800 px-2.5 py-1 rounded-lg">
-                                        ⏳ Currently on Loan
+                                    <span class="text-xs font-bold bg-rose-100 text-rose-800 border border-rose-300 px-2.5 py-1 rounded-lg">
+                                        ⏳ Borrowed
                                     </span>
                                 </template>
                                 <template x-if="quickBook && !quickBook.is_reference && !quickBook.is_borrowed">
-                                    <span class="text-xs font-bold bg-emerald-100 text-emerald-800 px-2.5 py-1 rounded-lg">
-                                        ✓ Available to Borrow
+                                    <span class="text-xs font-bold bg-emerald-100 text-emerald-800 border border-emerald-300 px-2.5 py-1 rounded-lg">
+                                        ✓ Available
                                     </span>
                                 </template>
                             </div>
@@ -640,11 +654,37 @@
                                         </button>
                                     </form>
                                 </template>
+                                <template x-if="quickBook && quickBook.is_reference">
+                                    <span class="inline-flex items-center space-x-1 px-3 py-1.5 text-xs font-bold bg-amber-100 text-amber-900 border border-amber-300 rounded-xl">
+                                        <span>🔒</span>
+                                        <span>Reference</span>
+                                    </span>
+                                </template>
+                                <template x-if="quickBook && !quickBook.is_reference && quickBook.is_borrowed">
+                                    <span class="inline-flex items-center space-x-1 px-3 py-1.5 text-xs font-bold bg-rose-100 text-rose-800 border border-rose-300 rounded-xl">
+                                        <span>⏳</span>
+                                        <span>Borrowed</span>
+                                    </span>
+                                </template>
                             @else
-                                <a href="{{ route('login') }}"
-                                   class="px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-bold rounded-xl shadow-md transition">
-                                    Sign In to Borrow
-                                </a>
+                                <template x-if="quickBook && !quickBook.is_reference && !quickBook.is_borrowed">
+                                    <a href="{{ route('login') }}"
+                                       class="px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-bold rounded-xl shadow-md transition">
+                                        Sign In to Borrow
+                                    </a>
+                                </template>
+                                <template x-if="quickBook && quickBook.is_reference">
+                                    <span class="inline-flex items-center space-x-1 px-3 py-1.5 text-xs font-bold bg-amber-100 text-amber-900 border border-amber-300 rounded-xl">
+                                        <span>🔒</span>
+                                        <span>Reference</span>
+                                    </span>
+                                </template>
+                                <template x-if="quickBook && !quickBook.is_reference && quickBook.is_borrowed">
+                                    <span class="inline-flex items-center space-x-1 px-3 py-1.5 text-xs font-bold bg-rose-100 text-rose-800 border border-rose-300 rounded-xl">
+                                        <span>⏳</span>
+                                        <span>Borrowed</span>
+                                    </span>
+                                </template>
                             @endauth
                         </div>
                     </div>
