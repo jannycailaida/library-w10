@@ -1,5 +1,17 @@
 <x-app-layout>
-    <div class="py-6 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    <div x-data="{
+        quickBook: null,
+        isModalOpen: false,
+        openQuickView(bookData) {
+            this.quickBook = bookData;
+            this.isModalOpen = true;
+        },
+        closeQuickView() {
+            this.isModalOpen = false;
+            this.quickBook = null;
+        }
+    }" @keydown.escape.window="closeQuickView()" class="py-6 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+
         {{-- Flash message --}}
         @if (session('status'))
             <div class="mb-6 p-4 rounded-2xl bg-emerald-500/10 border border-emerald-500/30 text-emerald-800 flex items-center justify-between shadow-sm animate-fade-in">
@@ -10,8 +22,65 @@
             </div>
         @endif
 
+        {{-- 👤 Personalized Student / Guest Welcome Banner --}}
+        @auth
+            @if(auth()->user()->isMember())
+                <div class="mb-6 bg-gradient-to-r from-indigo-50 via-purple-50 to-pink-50 border border-indigo-100 rounded-2xl p-4 flex flex-col sm:flex-row sm:items-center justify-between gap-3 shadow-sm">
+                    <div class="flex items-center space-x-3">
+                        <span class="w-10 h-10 rounded-xl bg-indigo-600 text-white flex items-center justify-center text-lg font-bold shadow-sm">
+                            🎓
+                        </span>
+                        <div>
+                            <div class="text-sm font-bold text-gray-900">
+                                Welcome back, {{ auth()->user()->name }}!
+                            </div>
+                            <div class="text-xs text-gray-600">
+                                @if($userActiveLoansCount > 0)
+                                    You currently have <span class="font-bold text-indigo-700">{{ $userActiveLoansCount }}</span> active borrowed book(s).
+                                @else
+                                    You have no books currently checked out. Ready to borrow a new title?
+                                @endif
+                            </div>
+                        </div>
+                    </div>
+                    <div class="shrink-0">
+                        <a href="{{ route('my.loans') }}"
+                           class="inline-flex items-center space-x-1.5 px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-bold rounded-xl shadow-sm transition">
+                            <span>📖</span>
+                            <span>My Active Loans</span>
+                            <span>→</span>
+                        </a>
+                    </div>
+                </div>
+            @endif
+        @else
+            <div class="mb-6 bg-gradient-to-r from-slate-900 via-indigo-950 to-slate-900 text-white rounded-2xl p-4 sm:p-5 flex flex-col sm:flex-row sm:items-center justify-between gap-4 shadow-sm border border-indigo-900/50">
+                <div class="flex items-center space-x-3">
+                    <span class="w-10 h-10 rounded-xl bg-white/10 text-white flex items-center justify-center text-lg font-bold backdrop-blur-sm">
+                        📚
+                    </span>
+                    <div>
+                        <div class="text-sm font-bold text-white">
+                            Student & Faculty Digital Access
+                        </div>
+                        <div class="text-xs text-indigo-200/80">
+                            Registered students can borrow textbooks directly for 14 days with zero late fees.
+                        </div>
+                    </div>
+                </div>
+                <div class="flex items-center space-x-2 shrink-0">
+                    <a href="{{ route('login') }}" class="px-3.5 py-1.5 bg-white/10 hover:bg-white/20 text-white text-xs font-semibold rounded-xl transition">
+                        Log In
+                    </a>
+                    <a href="{{ route('register') }}" class="px-3.5 py-1.5 bg-indigo-500 hover:bg-indigo-600 text-white text-xs font-bold rounded-xl shadow-md transition">
+                        Register Free
+                    </a>
+                </div>
+            </div>
+        @endauth
+
         {{-- 🏛️ Modern Hero Banner --}}
-        <div class="relative rounded-3xl overflow-hidden bg-gradient-to-br from-slate-950 via-indigo-950 to-slate-900 text-white p-8 sm:p-12 mb-10 shadow-xl border border-indigo-900/40">
+        <div class="relative rounded-3xl overflow-hidden bg-gradient-to-br from-slate-950 via-indigo-950 to-slate-900 text-white p-8 sm:p-12 mb-8 shadow-xl border border-indigo-900/40">
             {{-- Background decorative ambient lights --}}
             <div class="absolute -right-16 -top-16 w-80 h-80 rounded-full bg-indigo-500/20 blur-3xl pointer-events-none"></div>
             <div class="absolute right-1/4 -bottom-20 w-80 h-80 rounded-full bg-purple-500/15 blur-3xl pointer-events-none"></div>
@@ -87,9 +156,46 @@
             </div>
         </div>
 
+        {{-- 🏷️ Academic Subject Categories Filter Bar --}}
+        <div class="mb-6 overflow-x-auto pb-2 scrollbar-thin">
+            <div class="flex items-center space-x-2 min-w-max">
+                @php
+                    $categories = [
+                        ['slug' => 'all', 'name' => 'All Subjects', 'icon' => '🌐'],
+                        ['slug' => 'cs', 'name' => 'Computer Science', 'icon' => '💻'],
+                        ['slug' => 'math', 'name' => 'Mathematics', 'icon' => '📐'],
+                        ['slug' => 'physics', 'name' => 'Physics & Engineering', 'icon' => '🔬'],
+                        ['slug' => 'biology', 'name' => 'Biology & Life', 'icon' => '🧬'],
+                        ['slug' => 'economics', 'name' => 'Economics & Business', 'icon' => '📈'],
+                        ['slug' => 'literature', 'name' => 'Literature & Classics', 'icon' => '📚'],
+                        ['slug' => 'reference', 'name' => 'Reference Collection', 'icon' => '🔒'],
+                    ];
+                @endphp
+
+                @foreach($categories as $cat)
+                    @php
+                        $isActive = ($category ?? 'all') === $cat['slug'];
+                        $count = $categoryCounts[$cat['slug']] ?? 0;
+                    @endphp
+                    <a href="{{ route('books.index', array_merge(request()->query(), ['category' => $cat['slug'], 'page' => 1])) }}"
+                       class="px-3.5 py-2 rounded-xl text-xs font-bold transition flex items-center space-x-2 {{ $isActive ? 'bg-indigo-600 text-white shadow-md shadow-indigo-600/20' : 'bg-white text-gray-700 hover:bg-gray-50 border border-gray-200' }}">
+                        <span>{{ $cat['icon'] }}</span>
+                        <span>{{ $cat['name'] }}</span>
+                        <span class="px-1.5 py-0.5 rounded-full text-[10px] {{ $isActive ? 'bg-white/20 text-white' : 'bg-gray-100 text-gray-500' }}">
+                            {{ $count }}
+                        </span>
+                    </a>
+                @endforeach
+            </div>
+        </div>
+
         {{-- 🔍 Search & Filter Toolbar --}}
         <div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-4 sm:p-5 mb-8">
             <form method="GET" action="{{ route('books.index') }}" class="flex flex-col lg:flex-row gap-4 items-stretch lg:items-center justify-between">
+                {{-- Preserve Category --}}
+                <input type="hidden" name="category" value="{{ $category ?? 'all' }}">
+
+                {{-- Search Input with clear icon --}}
                 <div class="flex-1 relative">
                     <div class="absolute inset-y-0 start-0 flex items-center ps-4 pointer-events-none text-gray-400">
                         <svg class="w-5 h-5" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -98,34 +204,44 @@
                     </div>
                     <input type="text" name="search" value="{{ $search }}"
                            placeholder="Search by title, author, or 13-digit ISBN..."
-                           class="w-full ps-11 pe-4 py-3 bg-gray-50 border border-gray-200 rounded-xl text-sm focus:bg-white focus:ring-2 focus:ring-indigo-600 focus:border-indigo-600 transition placeholder:text-gray-400">
+                           class="w-full ps-11 pe-4 py-2.5 bg-gray-50 border border-gray-200 rounded-xl text-sm focus:bg-white focus:ring-2 focus:ring-indigo-600 focus:border-indigo-600 transition placeholder:text-gray-400">
                 </div>
 
-                <div class="flex items-center gap-2 flex-wrap">
-                    <a href="{{ route('books.index', ['search' => $search]) }}"
-                       class="px-4 py-2.5 text-xs font-bold rounded-xl transition flex items-center space-x-1.5 {{ empty($filter) ? 'bg-indigo-600 text-white shadow-md shadow-indigo-600/20' : 'bg-gray-100 text-gray-700 hover:bg-gray-200' }}">
-                        <span>📚 All Books</span>
-                        <span class="opacity-75 font-normal">({{ $totalBooks }})</span>
-                    </a>
+                {{-- Availability & Sorting controls --}}
+                <div class="flex items-center gap-2 flex-wrap justify-between lg:justify-end">
+                    {{-- Availability Pills --}}
+                    <div class="inline-flex rounded-xl p-1 bg-gray-100 border border-gray-200 text-xs font-semibold">
+                        <a href="{{ route('books.index', array_merge(request()->query(), ['filter' => null, 'page' => 1])) }}"
+                           class="px-3 py-1.5 rounded-lg transition {{ empty($filter) ? 'bg-white text-gray-900 shadow-sm font-bold' : 'text-gray-600 hover:text-gray-900' }}">
+                            All
+                        </a>
+                        <a href="{{ route('books.index', array_merge(request()->query(), ['filter' => 'available', 'page' => 1])) }}"
+                           class="px-3 py-1.5 rounded-lg transition flex items-center space-x-1 {{ $filter === 'available' ? 'bg-emerald-600 text-white shadow-sm font-bold' : 'text-gray-600 hover:text-gray-900' }}">
+                            <span class="w-1.5 h-1.5 rounded-full {{ $filter === 'available' ? 'bg-white' : 'bg-emerald-500' }}"></span>
+                            <span>Available ({{ $availableCount }})</span>
+                        </a>
+                        <a href="{{ route('books.index', array_merge(request()->query(), ['filter' => 'reference', 'page' => 1])) }}"
+                           class="px-3 py-1.5 rounded-lg transition flex items-center space-x-1 {{ $filter === 'reference' ? 'bg-amber-600 text-white shadow-sm font-bold' : 'text-gray-600 hover:text-gray-900' }}">
+                            <span>🔒 Reference ({{ $referenceCount }})</span>
+                        </a>
+                    </div>
 
-                    <a href="{{ route('books.index', ['search' => $search, 'filter' => 'available']) }}"
-                       class="px-4 py-2.5 text-xs font-bold rounded-xl transition flex items-center space-x-1.5 {{ $filter === 'available' ? 'bg-emerald-600 text-white shadow-md shadow-emerald-600/20' : 'bg-gray-100 text-gray-700 hover:bg-gray-200' }}">
-                        <span class="w-2 h-2 rounded-full bg-emerald-400"></span>
-                        <span>Available to Borrow</span>
-                        <span class="opacity-75 font-normal">({{ $availableCount }})</span>
-                    </a>
+                    {{-- Sort Dropdown --}}
+                    <div class="relative">
+                        <select name="sort" onchange="this.form.submit()"
+                                class="pe-8 ps-3 py-2 bg-gray-50 border border-gray-200 rounded-xl text-xs font-semibold text-gray-700 focus:bg-white focus:ring-2 focus:ring-indigo-600 focus:border-indigo-600 cursor-pointer">
+                            <option value="title_asc" {{ ($sort ?? '') === 'title_asc' ? 'selected' : '' }}>🔤 Title (A - Z)</option>
+                            <option value="title_desc" {{ ($sort ?? '') === 'title_desc' ? 'selected' : '' }}>🔤 Title (Z - A)</option>
+                            <option value="newest" {{ ($sort ?? '') === 'newest' ? 'selected' : '' }}>📅 Newest Edition</option>
+                            <option value="oldest" {{ ($sort ?? '') === 'oldest' ? 'selected' : '' }}>⏳ Oldest Edition</option>
+                        </select>
+                    </div>
 
-                    <a href="{{ route('books.index', ['search' => $search, 'filter' => 'reference']) }}"
-                       class="px-4 py-2.5 text-xs font-bold rounded-xl transition flex items-center space-x-1.5 {{ $filter === 'reference' ? 'bg-amber-600 text-white shadow-md shadow-amber-600/20' : 'bg-gray-100 text-gray-700 hover:bg-gray-200' }}">
-                        <span>🔒 Reference Only</span>
-                        <span class="opacity-75 font-normal">({{ $referenceCount }})</span>
-                    </a>
-
-                    <button type="submit" class="px-5 py-2.5 bg-gray-900 hover:bg-gray-800 text-white text-xs font-bold rounded-xl transition shadow-sm">
+                    <button type="submit" class="px-4 py-2 bg-gray-900 hover:bg-gray-800 text-white text-xs font-bold rounded-xl transition shadow-sm">
                         Filter
                     </button>
 
-                    @if($search || $filter)
+                    @if($search || $filter || ($category && $category !== 'all'))
                         <a href="{{ route('books.index') }}" class="px-3 py-2 text-xs font-semibold text-gray-500 hover:text-rose-600 transition">
                             ✕ Reset
                         </a>
@@ -141,21 +257,20 @@
                     🔍
                 </div>
                 <h3 class="text-xl font-bold text-gray-900">No books found</h3>
-                <p class="text-sm text-gray-500 mt-1">We couldn't find any books matching your search query or filter.</p>
+                <p class="text-sm text-gray-500 mt-1">We couldn't find any books matching your search query or selected subject.</p>
                 <a href="{{ route('books.index') }}" class="mt-6 inline-flex items-center px-4 py-2 bg-indigo-600 text-white text-xs font-bold rounded-xl hover:bg-indigo-700 transition">
                     View All Books
                 </a>
             </div>
         @else
             @php
-                // Distinct thematic palettes for realistic book jacket variety
                 $themes = [
-                    ['bg' => 'from-slate-950 via-blue-950 to-indigo-950', 'accent' => 'border-blue-400/30', 'spine' => 'border-blue-900', 'ribbon' => 'bg-blue-400', 'text_accent' => 'text-blue-300'],
-                    ['bg' => 'from-slate-950 via-emerald-950 to-teal-950', 'accent' => 'border-emerald-400/30', 'spine' => 'border-emerald-900', 'ribbon' => 'bg-emerald-400', 'text_accent' => 'text-emerald-300'],
-                    ['bg' => 'from-slate-950 via-rose-950 to-red-950', 'accent' => 'border-rose-400/30', 'spine' => 'border-rose-900', 'ribbon' => 'bg-rose-400', 'text_accent' => 'text-rose-300'],
-                    ['bg' => 'from-slate-950 via-purple-950 to-indigo-950', 'accent' => 'border-purple-400/30', 'spine' => 'border-purple-900', 'ribbon' => 'bg-purple-400', 'text_accent' => 'text-purple-300'],
-                    ['bg' => 'from-stone-950 via-amber-950 to-yellow-950', 'accent' => 'border-amber-400/30', 'spine' => 'border-amber-900', 'ribbon' => 'bg-amber-400', 'text_accent' => 'text-amber-300'],
-                    ['bg' => 'from-neutral-950 via-slate-900 to-stone-950', 'accent' => 'border-slate-400/30', 'spine' => 'border-slate-900', 'ribbon' => 'bg-slate-400', 'text_accent' => 'text-slate-300'],
+                    ['bg' => 'from-slate-950 via-blue-950 to-indigo-950', 'spine' => 'border-blue-900', 'ribbon' => 'bg-blue-400', 'text_accent' => 'text-blue-300'],
+                    ['bg' => 'from-slate-950 via-emerald-950 to-teal-950', 'spine' => 'border-emerald-900', 'ribbon' => 'bg-emerald-400', 'text_accent' => 'text-emerald-300'],
+                    ['bg' => 'from-slate-950 via-rose-950 to-red-950', 'spine' => 'border-rose-900', 'ribbon' => 'bg-rose-400', 'text_accent' => 'text-rose-300'],
+                    ['bg' => 'from-slate-950 via-purple-950 to-indigo-950', 'spine' => 'border-purple-900', 'ribbon' => 'bg-purple-400', 'text_accent' => 'text-purple-300'],
+                    ['bg' => 'from-stone-950 via-amber-950 to-yellow-950', 'spine' => 'border-amber-900', 'ribbon' => 'bg-amber-400', 'text_accent' => 'text-amber-300'],
+                    ['bg' => 'from-neutral-950 via-slate-900 to-stone-950', 'spine' => 'border-slate-900', 'ribbon' => 'bg-slate-400', 'text_accent' => 'text-slate-300'],
                 ];
             @endphp
 
@@ -164,6 +279,20 @@
                     @php
                         $isBorrowed = $book->active_loans_count > 0;
                         $theme = $themes[$book->id % count($themes)];
+                        $bookJson = json_encode([
+                            'id' => $book->id,
+                            'title' => $book->title,
+                            'author' => $book->author->name,
+                            'isbn' => $book->isbn,
+                            'year' => $book->published_year,
+                            'cover_path' => $book->cover_path ? asset($book->cover_path) : null,
+                            'is_reference' => $book->is_reference,
+                            'is_borrowed' => $isBorrowed,
+                            'category_name' => $book->category_name,
+                            'category_icon' => $book->category_icon,
+                            'show_url' => route('books.show', $book),
+                            'borrow_url' => route('books.borrow', $book),
+                        ]);
                     @endphp
 
                     <div class="group bg-white rounded-2xl shadow-sm hover:shadow-2xl hover:-translate-y-2 border border-gray-100 overflow-hidden flex flex-col transition-all duration-300">
@@ -176,10 +305,20 @@
                                      class="absolute inset-0 w-full h-full object-cover group-hover:scale-105 transition-transform duration-500">
 
                                 {{-- Soft top gradient for badge readability --}}
-                                <div class="absolute inset-x-0 top-0 h-20 bg-gradient-to-b from-black/70 to-transparent pointer-events-none"></div>
+                                <div class="absolute inset-x-0 top-0 h-20 bg-gradient-to-b from-black/75 to-transparent pointer-events-none"></div>
 
                                 {{-- Hardcover spine shadow crease --}}
                                 <div class="absolute left-0 top-0 bottom-0 w-3 bg-gradient-to-r from-black/70 via-black/30 to-transparent pointer-events-none z-10"></div>
+
+                                {{-- Quick View Hover Button --}}
+                                <button type="button"
+                                        @click='openQuickView({!! $bookJson !!})'
+                                        class="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 flex items-center justify-center transition-opacity duration-200 z-30 cursor-pointer">
+                                    <span class="px-4 py-2 bg-white/95 backdrop-blur-sm rounded-full text-xs font-bold text-gray-900 shadow-xl flex items-center space-x-1.5 transform translate-y-2 group-hover:translate-y-0 transition-transform">
+                                        <span>👁️</span>
+                                        <span>Quick View</span>
+                                    </span>
+                                </button>
 
                                 {{-- Bookmark ribbon for Available Books --}}
                                 @if (!$book->is_reference && !$isBorrowed)
@@ -262,6 +401,14 @@
                         {{-- 📄 Book Details & Bottom Action Bar --}}
                         <div class="p-5 flex-1 flex flex-col justify-between bg-white">
                             <div>
+                                {{-- Subject Pill --}}
+                                <div class="mb-2">
+                                    <span class="inline-flex items-center space-x-1 text-[11px] font-bold text-indigo-700 bg-indigo-50 px-2 py-0.5 rounded-md">
+                                        <span>{{ $book->category_icon }}</span>
+                                        <span>{{ $book->category_name }}</span>
+                                    </span>
+                                </div>
+
                                 <h3 class="font-bold text-gray-900 text-sm leading-snug line-clamp-2 hover:text-indigo-600 transition">
                                     <a href="{{ route('books.show', $book) }}">
                                         {{ $book->title }}
@@ -278,11 +425,12 @@
                             </div>
 
                             <div class="pt-4 mt-4 border-t border-gray-100 flex items-center justify-between">
-                                <a href="{{ route('books.show', $book) }}"
-                                   class="text-xs font-bold text-indigo-600 hover:text-indigo-800 transition flex items-center space-x-1">
-                                    <span>Details</span>
+                                <button type="button"
+                                        @click='openQuickView({!! $bookJson !!})'
+                                        class="text-xs font-bold text-indigo-600 hover:text-indigo-800 transition flex items-center space-x-1">
+                                    <span>Quick View</span>
                                     <span>→</span>
-                                </a>
+                                </button>
 
                                 @auth
                                     @if (!$book->is_reference && !$isBorrowed)
@@ -319,5 +467,129 @@
                 {{ $books->links() }}
             </div>
         @endif
+
+        {{-- 🔍 Alpine.js Quick Book Preview Modal --}}
+        <div x-show="isModalOpen"
+             x-cloak
+             x-transition:enter="transition ease-out duration-300"
+             x-transition:enter-start="opacity-0"
+             x-transition:enter-end="opacity-100"
+             x-transition:leave="transition ease-in duration-200"
+             x-transition:leave-start="opacity-100"
+             x-transition:leave-end="opacity-0"
+             class="fixed inset-0 z-50 overflow-y-auto bg-black/60 backdrop-blur-sm flex items-center justify-center p-4">
+
+            <div @click.away="closeQuickView()"
+                 x-show="isModalOpen"
+                 x-transition:enter="transition ease-out duration-300"
+                 x-transition:enter-start="opacity-0 translate-y-4 scale-95"
+                 x-transition:enter-end="opacity-100 translate-y-0 scale-100"
+                 x-transition:leave="transition ease-in duration-200"
+                 x-transition:leave-start="opacity-100 translate-y-0 scale-100"
+                 x-transition:leave-end="opacity-0 translate-y-4 scale-95"
+                 class="bg-white rounded-3xl shadow-2xl max-w-2xl w-full overflow-hidden border border-gray-100 relative">
+
+                {{-- Close Button --}}
+                <button type="button"
+                        @click="closeQuickView()"
+                        class="absolute top-4 right-4 z-20 w-8 h-8 rounded-full bg-gray-100 hover:bg-gray-200 text-gray-600 flex items-center justify-center text-sm font-bold transition">
+                    ✕
+                </button>
+
+                <div class="grid grid-cols-1 md:grid-cols-12 gap-0" x-if="quickBook">
+                    {{-- Cover Left Column --}}
+                    <div class="md:col-span-5 bg-slate-950 p-6 flex items-center justify-center relative overflow-hidden">
+                        <template x-if="quickBook && quickBook.cover_path">
+                            <img :src="quickBook.cover_path"
+                                 :alt="quickBook.title"
+                                 class="w-full max-h-[320px] object-cover rounded-xl shadow-2xl border border-white/20">
+                        </template>
+                        <template x-if="quickBook && !quickBook.cover_path">
+                            <div class="p-8 text-center text-white">
+                                <span class="text-6xl">📖</span>
+                                <div class="mt-4 font-bold text-sm" x-text="quickBook ? quickBook.title : ''"></div>
+                            </div>
+                        </template>
+                    </div>
+
+                    {{-- Info Right Column --}}
+                    <div class="md:col-span-7 p-6 sm:p-8 flex flex-col justify-between">
+                        <div>
+                            {{-- Category and Status Badges --}}
+                            <div class="flex items-center gap-2 flex-wrap mb-3">
+                                <span class="inline-flex items-center space-x-1 text-xs font-bold text-indigo-700 bg-indigo-50 px-2.5 py-1 rounded-lg">
+                                    <span x-text="quickBook ? quickBook.category_icon : ''"></span>
+                                    <span x-text="quickBook ? quickBook.category_name : ''"></span>
+                                </span>
+
+                                <template x-if="quickBook && quickBook.is_reference">
+                                    <span class="text-xs font-bold bg-amber-100 text-amber-800 px-2.5 py-1 rounded-lg">
+                                        🔒 Reference Only
+                                    </span>
+                                </template>
+                                <template x-if="quickBook && !quickBook.is_reference && quickBook.is_borrowed">
+                                    <span class="text-xs font-bold bg-rose-100 text-rose-800 px-2.5 py-1 rounded-lg">
+                                        ⏳ Currently on Loan
+                                    </span>
+                                </template>
+                                <template x-if="quickBook && !quickBook.is_reference && !quickBook.is_borrowed">
+                                    <span class="text-xs font-bold bg-emerald-100 text-emerald-800 px-2.5 py-1 rounded-lg">
+                                        ✓ Available to Borrow
+                                    </span>
+                                </template>
+                            </div>
+
+                            <h3 class="text-xl font-extrabold text-gray-900 leading-snug" x-text="quickBook ? quickBook.title : ''"></h3>
+                            <p class="text-sm font-medium text-gray-600 mt-1">
+                                Author: <span class="text-gray-900 font-bold" x-text="quickBook ? quickBook.author : ''"></span>
+                            </p>
+
+                            {{-- Metadata stats --}}
+                            <div class="mt-4 grid grid-cols-2 gap-3 p-3.5 bg-gray-50 rounded-2xl text-xs">
+                                <div>
+                                    <span class="text-gray-400 block font-medium">Published Year</span>
+                                    <span class="font-bold text-gray-900 text-sm font-mono" x-text="quickBook ? quickBook.year : ''"></span>
+                                </div>
+                                <div>
+                                    <span class="text-gray-400 block font-medium">ISBN-13</span>
+                                    <span class="font-bold text-gray-900 text-sm font-mono truncate block" x-text="quickBook ? quickBook.isbn : ''"></span>
+                                </div>
+                            </div>
+
+                            <div class="mt-4 p-3 bg-indigo-50/60 rounded-xl border border-indigo-100/60 text-xs text-indigo-900 flex items-start space-x-2">
+                                <span class="text-sm">ℹ️</span>
+                                <span class="leading-relaxed">Standard university 14-day checkout period for students. Reference volumes are reserved for in-library reading.</span>
+                            </div>
+                        </div>
+
+                        {{-- Modal Bottom Actions --}}
+                        <div class="pt-6 mt-6 border-t border-gray-100 flex items-center justify-between gap-3">
+                            <a :href="quickBook ? quickBook.show_url : '#'"
+                               class="text-xs font-bold text-gray-600 hover:text-indigo-600 transition flex items-center space-x-1">
+                                <span>Full Details Page</span>
+                                <span>→</span>
+                            </a>
+
+                            @auth
+                                <template x-if="quickBook && !quickBook.is_reference && !quickBook.is_borrowed">
+                                    <form method="POST" :action="quickBook ? quickBook.borrow_url : '#'">
+                                        @csrf
+                                        <button type="submit"
+                                                class="px-5 py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold rounded-xl shadow-md shadow-emerald-600/20 transition transform active:scale-95">
+                                            📖 Borrow Now
+                                        </button>
+                                    </form>
+                                </template>
+                            @else
+                                <a href="{{ route('login') }}"
+                                   class="px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-bold rounded-xl shadow-md transition">
+                                    Sign In to Borrow
+                                </a>
+                            @endauth
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
     </div>
 </x-app-layout>

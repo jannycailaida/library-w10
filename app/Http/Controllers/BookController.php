@@ -17,6 +17,8 @@ class BookController extends Controller
     {
         $search = $request->query('search');
         $filter = $request->query('filter');
+        $category = $request->query('category', 'all');
+        $sort = $request->query('sort', 'title_asc');
 
         $query = Book::with('author')->withCount([
             'members as active_loans_count' => fn ($q) => $q->whereNull('returned_at'),
@@ -37,7 +39,42 @@ class BookController extends Controller
             $query->where('is_reference', true);
         }
 
-        $books = $query->orderBy('title')->paginate(12)->withQueryString();
+        // Category filter
+        if ($category && $category !== 'all') {
+            if ($category === 'reference') {
+                $query->where('is_reference', true);
+            } else {
+                $authorKeywords = match ($category) {
+                    'cs' => ['Martin', 'Cormen', 'Silberschatz'],
+                    'math' => ['Stewart'],
+                    'physics' => ['Young'],
+                    'biology' => ['Campbell'],
+                    'economics' => ['Mankiw'],
+                    'literature' => ['Fitzgerald', 'Orwell'],
+                    default => [],
+                };
+
+                if (! empty($authorKeywords)) {
+                    $query->whereHas('author', function ($aq) use ($authorKeywords) {
+                        $aq->where(function ($sub) use ($authorKeywords) {
+                            foreach ($authorKeywords as $keyword) {
+                                $sub->orWhere('name', 'like', "%{$keyword}%");
+                            }
+                        });
+                    });
+                }
+            }
+        }
+
+        // Sorting
+        match ($sort) {
+            'newest' => $query->orderByDesc('published_year'),
+            'oldest' => $query->orderBy('published_year'),
+            'title_desc' => $query->orderByDesc('title'),
+            default => $query->orderBy('title'),
+        };
+
+        $books = $query->paginate(12)->withQueryString();
 
         $totalBooks = Book::count();
         $availableCount = Book::where('is_reference', false)
@@ -46,7 +83,37 @@ class BookController extends Controller
         $referenceCount = Book::where('is_reference', true)->count();
         $totalMembers = Member::count();
 
-        return view('books.index', compact('books', 'search', 'filter', 'totalBooks', 'availableCount', 'referenceCount', 'totalMembers'));
+        // Count per subject category
+        $categoryCounts = [
+            'all' => $totalBooks,
+            'cs' => Book::whereHas('author', fn ($q) => $q->where('name', 'like', '%Martin%')->orWhere('name', 'like', '%Cormen%')->orWhere('name', 'like', '%Silberschatz%'))->count(),
+            'math' => Book::whereHas('author', fn ($q) => $q->where('name', 'like', '%Stewart%'))->count(),
+            'physics' => Book::whereHas('author', fn ($q) => $q->where('name', 'like', '%Young%'))->count(),
+            'biology' => Book::whereHas('author', fn ($q) => $q->where('name', 'like', '%Campbell%'))->count(),
+            'economics' => Book::whereHas('author', fn ($q) => $q->where('name', 'like', '%Mankiw%'))->count(),
+            'literature' => Book::whereHas('author', fn ($q) => $q->where('name', 'like', '%Fitzgerald%')->orWhere('name', 'like', '%Orwell%'))->count(),
+            'reference' => $referenceCount,
+        ];
+
+        // Active loans count for logged in member
+        $userActiveLoansCount = 0;
+        if (auth()->check() && auth()->user()->member) {
+            $userActiveLoansCount = auth()->user()->member->books()->wherePivotNull('returned_at')->count();
+        }
+
+        return view('books.index', compact(
+            'books',
+            'search',
+            'filter',
+            'category',
+            'sort',
+            'totalBooks',
+            'availableCount',
+            'referenceCount',
+            'totalMembers',
+            'categoryCounts',
+            'userActiveLoansCount'
+        ));
     }
 
     /**

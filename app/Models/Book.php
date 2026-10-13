@@ -58,4 +58,70 @@ class Book extends Model
     {
         return ! $this->is_reference && ! $this->isBorrowed();
     }
+
+    /**
+     * Category slug for filtering.
+     */
+    public function getCategorySlugAttribute(): string
+    {
+        if ($this->is_reference) {
+            return 'reference';
+        }
+
+        $author = $this->author?->name ?? '';
+        if (str_contains($author, 'Martin') || str_contains($author, 'Cormen') || str_contains($author, 'Silberschatz')) {
+            return 'cs';
+        }
+        if (str_contains($author, 'Stewart')) {
+            return 'math';
+        }
+        if (str_contains($author, 'Young')) {
+            return 'physics';
+        }
+        if (str_contains($author, 'Campbell')) {
+            return 'biology';
+        }
+        if (str_contains($author, 'Mankiw')) {
+            return 'economics';
+        }
+        if (str_contains($author, 'Fitzgerald') || str_contains($author, 'Orwell')) {
+            return 'literature';
+        }
+
+        return 'general';
+    }
+
+    /**
+     * Category display name.
+     */
+    public function getCategoryNameAttribute(): string
+    {
+        return match ($this->category_slug) {
+            'cs' => 'Computer Science',
+            'math' => 'Mathematics',
+            'physics' => 'Physics & Engineering',
+            'biology' => 'Biology & Life Sciences',
+            'economics' => 'Economics & Business',
+            'literature' => 'Literature & Classics',
+            'reference' => 'Reference Collection',
+            default => 'General Studies',
+        };
+    }
+
+    /**
+     * Category Icon emoji.
+     */
+    public function getCategoryIconAttribute(): string
+    {
+        return match ($this->category_slug) {
+            'cs' => '💻',
+            'math' => '📐',
+            'physics' => '🔬',
+            'biology' => '🧬',
+            'economics' => '📈',
+            'literature' => '📚',
+            'reference' => '🔒',
+            default => '📖',
+        };
+    }
 }

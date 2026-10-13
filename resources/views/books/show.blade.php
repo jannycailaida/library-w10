@@ -105,8 +105,9 @@
                 <div class="md:col-span-7 p-8 sm:p-10 flex flex-col justify-between">
                     <div>
                         <div class="flex items-center space-x-2">
-                            <span class="text-xs font-bold uppercase tracking-wider text-indigo-600 bg-indigo-50 px-2.5 py-1 rounded-md">
-                                Book Details
+                            <span class="text-xs font-bold uppercase tracking-wider text-indigo-700 bg-indigo-50 px-2.5 py-1 rounded-md flex items-center space-x-1">
+                                <span>{{ $book->category_icon }}</span>
+                                <span>{{ $book->category_name }}</span>
                             </span>
                             <span class="text-xs font-medium text-gray-400">Library ID: #{{ $book->id }}</span>
                         </div>
