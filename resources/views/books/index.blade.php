@@ -143,16 +143,76 @@
                     </div>
                 </div>
 
-                {{-- Action on Hero --}}
-                @can('create', App\Models\Book::class)
-                    <div class="shrink-0">
-                        <a href="{{ route('books.create') }}"
-                           class="inline-flex items-center space-x-2 px-6 py-3.5 bg-indigo-600 hover:bg-indigo-500 text-white font-bold text-sm rounded-2xl shadow-lg shadow-indigo-600/30 transition transform hover:-translate-y-0.5 active:translate-y-0">
-                            <span class="text-lg">+</span>
-                            <span>Add New Book</span>
-                        </a>
+                {{-- 📚 Right Side: 3D Floating Book Showcase with Glow --}}
+                <div class="relative shrink-0 flex flex-col items-center lg:items-end justify-center pt-8 lg:pt-0">
+                    {{-- Ambient circular glow behind the book stack --}}
+                    <div class="absolute w-72 h-72 rounded-full bg-gradient-to-tr from-indigo-500/25 via-purple-500/25 to-pink-500/15 blur-3xl pointer-events-none"></div>
+
+                    {{-- 3D Overlapping Floating Book Stack --}}
+                    <div class="relative flex items-center justify-center py-6 px-4 [perspective:1000px] select-none group">
+
+                        {{-- Floating Top Pill --}}
+                        <div class="absolute -top-1 right-2 z-30 inline-flex items-center space-x-1.5 px-3 py-1 rounded-full bg-white/15 backdrop-blur-md border border-white/25 text-white text-[11px] font-bold shadow-lg shadow-black/30">
+                            <span class="text-amber-300">✦</span>
+                            <span>Featured Student Titles</span>
+                        </div>
+
+                        {{-- Book 1 (Left - Algorithms, tilted -12deg) --}}
+                        <div class="relative transform -rotate-12 translate-x-5 hover:-translate-y-2 hover:-rotate-6 transition-all duration-300 z-10 cursor-pointer">
+                            <div class="w-24 sm:w-28 h-36 sm:h-40 rounded-xl overflow-hidden shadow-2xl border-2 border-white/20 bg-slate-900">
+                                <img src="{{ asset('images/books/isbn_9780262046305.jpg') }}"
+                                     alt="Introduction to Algorithms"
+                                     class="w-full h-full object-cover">
+                            </div>
+                            <div class="absolute -bottom-2 -left-2 bg-indigo-900/90 backdrop-blur-sm text-[9px] font-bold text-indigo-200 px-2 py-0.5 rounded-md border border-indigo-400/30 shadow">
+                                Algorithms
+                            </div>
+                        </div>
+
+                        {{-- Book 2 (Center - Clean Code, elevated, prominent) --}}
+                        <div class="relative transform scale-110 hover:scale-115 -translate-y-2 transition-all duration-300 z-20 cursor-pointer">
+                            <div class="w-28 sm:w-32 h-40 sm:h-48 rounded-2xl overflow-hidden shadow-2xl shadow-indigo-950 border-2 border-amber-400/50 bg-slate-900 relative">
+                                <img src="{{ asset('images/books/isbn_9780132350884.jpg') }}"
+                                     alt="Clean Code"
+                                     class="w-full h-full object-cover">
+                                {{-- Bookmark ribbon --}}
+                                <div class="absolute top-0 right-3 w-3 h-6 bg-amber-400 [clip-path:polygon(0_0,100%_0,100%_100%,50%_75%,0_100%)] shadow"></div>
+                            </div>
+                            <div class="absolute -bottom-3 left-1/2 -translate-x-1/2 bg-amber-400 text-amber-950 text-[10px] font-black px-2.5 py-0.5 rounded-full shadow-md whitespace-nowrap">
+                                ★ Most Borrowed
+                            </div>
+                        </div>
+
+                        {{-- Book 3 (Right - Calculus, tilted +12deg) --}}
+                        <div class="relative transform rotate-12 -translate-x-5 hover:-translate-y-2 hover:rotate-6 transition-all duration-300 z-10 cursor-pointer">
+                            <div class="w-24 sm:w-28 h-36 sm:h-40 rounded-xl overflow-hidden shadow-2xl border-2 border-white/20 bg-slate-900">
+                                <img src="{{ asset('images/books/isbn_9781337613927.jpg') }}"
+                                     alt="Calculus"
+                                     class="w-full h-full object-cover">
+                            </div>
+                            <div class="absolute -bottom-2 -right-2 bg-purple-900/90 backdrop-blur-sm text-[9px] font-bold text-purple-200 px-2 py-0.5 rounded-md border border-purple-400/30 shadow">
+                                Calculus
+                            </div>
+                        </div>
+
+                        {{-- Floating Bottom Pill --}}
+                        <div class="absolute -bottom-2 left-2 z-30 inline-flex items-center space-x-1.5 px-3 py-1 rounded-full bg-slate-900/90 backdrop-blur-md border border-emerald-400/40 text-emerald-300 text-[11px] font-bold shadow-xl">
+                            <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
+                            <span>14-Day Free Loan</span>
+                        </div>
                     </div>
-                @endcan
+
+                    {{-- Staff Action Button --}}
+                    @can('create', App\Models\Book::class)
+                        <div class="mt-4 z-20">
+                            <a href="{{ route('books.create') }}"
+                               class="inline-flex items-center space-x-2 px-5 py-2.5 bg-indigo-600 hover:bg-indigo-500 text-white font-bold text-xs rounded-xl shadow-lg shadow-indigo-600/30 transition transform hover:-translate-y-0.5 active:translate-y-0 border border-indigo-400/30">
+                                <span class="text-base">+</span>
+                                <span>Add New Book to Shelf</span>
+                            </a>
+                        </div>
+                    @endcan
+                </div>
             </div>
         </div>
 
