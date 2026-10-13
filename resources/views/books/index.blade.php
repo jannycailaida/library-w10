@@ -175,8 +175,8 @@
                                      alt="{{ $book->title }}"
                                      class="absolute inset-0 w-full h-full object-cover group-hover:scale-105 transition-transform duration-500">
 
-                                {{-- Dark gradient overlays for readability and realism --}}
-                                <div class="absolute inset-0 bg-gradient-to-t from-black/85 via-black/15 to-black/60 pointer-events-none"></div>
+                                {{-- Soft top gradient for badge readability --}}
+                                <div class="absolute inset-x-0 top-0 h-20 bg-gradient-to-b from-black/70 to-transparent pointer-events-none"></div>
 
                                 {{-- Hardcover spine shadow crease --}}
                                 <div class="absolute left-0 top-0 bottom-0 w-3 bg-gradient-to-r from-black/70 via-black/30 to-transparent pointer-events-none z-10"></div>
@@ -187,7 +187,7 @@
                                 @endif
 
                                 {{-- Top Header on Book Cover: Status badge + Year --}}
-                                <div class="flex items-start justify-between z-10 relative p-4">
+                                <div class="flex items-start justify-between z-10 relative p-3.5">
                                     @if ($book->is_reference)
                                         <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-amber-400 text-amber-950 shadow-md">
                                             🔒 Reference
@@ -205,17 +205,6 @@
                                     <span class="text-xs text-white font-mono bg-black/60 backdrop-blur-sm px-2 py-0.5 rounded-md shadow-sm">
                                         {{ $book->published_year }}
                                     </span>
-                                </div>
-
-                                {{-- Bottom overlay info on picture --}}
-                                <div class="p-4 z-10 relative mt-auto">
-                                    <h4 class="font-serif font-bold text-white text-sm leading-snug line-clamp-2 drop-shadow-md group-hover:text-amber-200 transition">
-                                        {{ $book->title }}
-                                    </h4>
-                                    <div class="flex items-center justify-between text-[11px] text-white/70 font-mono mt-1">
-                                        <span>ISBN-13</span>
-                                        <span>{{ $book->isbn }}</span>
-                                    </div>
                                 </div>
                             @else
                                 {{-- Hardcover spine shadow crease --}}
