@@ -70,6 +70,36 @@ class DashboardController extends Controller
             ->take(4)
             ->get();
 
+        // 7-Day Library Activity for Chart
+        $chartLabels = [];
+        $chartBorrowed = [];
+        $chartReturned = [];
+
+        for ($i = 6; $i >= 0; $i--) {
+            $carbonDate = now()->subDays($i);
+            $dateStr = $carbonDate->format('Y-m-d');
+            $chartLabels[] = $carbonDate->format('D (M j)');
+
+            $chartBorrowed[] = DB::table('book_member')
+                ->whereDate('borrowed_at', $dateStr)
+                ->count();
+
+            $chartReturned[] = DB::table('book_member')
+                ->whereDate('returned_at', $dateStr)
+                ->count();
+        }
+
+        // Academic category breakdown
+        $categoryBreakdown = [
+            ['name' => 'Computer Science', 'icon' => '💻', 'count' => Book::whereHas('author', fn ($q) => $q->where('name', 'like', '%Martin%')->orWhere('name', 'like', '%Cormen%')->orWhere('name', 'like', '%Silberschatz%'))->count()],
+            ['name' => 'Literature & Classics', 'icon' => '📚', 'count' => Book::whereHas('author', fn ($q) => $q->where('name', 'like', '%Fitzgerald%')->orWhere('name', 'like', '%Orwell%'))->count()],
+            ['name' => 'Mathematics', 'icon' => '📐', 'count' => Book::whereHas('author', fn ($q) => $q->where('name', 'like', '%Stewart%'))->count()],
+            ['name' => 'Physics & Engineering', 'icon' => '🔬', 'count' => Book::whereHas('author', fn ($q) => $q->where('name', 'like', '%Young%'))->count()],
+            ['name' => 'Biology & Life', 'icon' => '🧬', 'count' => Book::whereHas('author', fn ($q) => $q->where('name', 'like', '%Campbell%'))->count()],
+            ['name' => 'Economics & Business', 'icon' => '📈', 'count' => Book::whereHas('author', fn ($q) => $q->where('name', 'like', '%Mankiw%'))->count()],
+            ['name' => 'Reference Collection', 'icon' => '🔒', 'count' => Book::where('is_reference', true)->count()],
+        ];
+
         return view('dashboard', compact(
             'user',
             'member',
@@ -82,7 +112,11 @@ class DashboardController extends Controller
             'myActiveLoans',
             'myTotalLoansCount',
             'recentLoans',
-            'featuredBooks'
+            'featuredBooks',
+            'chartLabels',
+            'chartBorrowed',
+            'chartReturned',
+            'categoryBreakdown'
         ));
     }
 }
