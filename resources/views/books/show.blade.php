@@ -72,16 +72,28 @@
                         </span>
                     </div>
 
-                    {{-- Stylized Hardcover Center --}}
-                    <div class="my-12 z-10 relative py-6 border-y border-white/15">
-                        <div class="text-5xl mb-4 opacity-20">📖</div>
-                        <h2 class="font-serif font-black text-2xl sm:text-3xl text-white leading-tight drop-shadow-md">
-                            {{ $book->title }}
-                        </h2>
-                        <p class="text-sm {{ $theme['text_accent'] }} font-semibold mt-2 tracking-wide">
-                            by {{ $book->author->name }}
-                        </p>
-                    </div>
+                    @if ($book->cover_path)
+                        {{-- Real Book Cover Photo Showcase --}}
+                        <div class="my-6 z-10 relative flex justify-center">
+                            <div class="relative group max-w-xs w-full">
+                                <img src="{{ asset($book->cover_path) }}"
+                                     alt="{{ $book->title }}"
+                                     class="w-full h-auto max-h-[380px] object-cover rounded-2xl shadow-2xl border-2 border-white/20 transform hover:scale-[1.02] transition duration-300">
+                                <div class="absolute left-0 top-0 bottom-0 w-3 bg-gradient-to-r from-black/60 via-black/20 to-transparent rounded-l-2xl pointer-events-none"></div>
+                            </div>
+                        </div>
+                    @else
+                        {{-- Stylized Hardcover Center --}}
+                        <div class="my-12 z-10 relative py-6 border-y border-white/15">
+                            <div class="text-5xl mb-4 opacity-20">📖</div>
+                            <h2 class="font-serif font-black text-2xl sm:text-3xl text-white leading-tight drop-shadow-md">
+                                {{ $book->title }}
+                            </h2>
+                            <p class="text-sm {{ $theme['text_accent'] }} font-semibold mt-2 tracking-wide">
+                                by {{ $book->author->name }}
+                            </p>
+                        </div>
+                    @endif
 
                     <div class="z-10 relative flex items-center justify-between text-xs text-white/60 font-mono pt-4 border-t border-white/10">
                         <span>ISBN-13</span>

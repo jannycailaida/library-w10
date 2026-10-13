@@ -168,56 +168,106 @@
 
                     <div class="group bg-white rounded-2xl shadow-sm hover:shadow-2xl hover:-translate-y-2 border border-gray-100 overflow-hidden flex flex-col transition-all duration-300">
                         {{-- 📖 Realistic Hardcover Book Spine & Jacket Mockup --}}
-                        <div class="h-56 bg-gradient-to-br {{ $theme['bg'] }} p-6 flex flex-col justify-between relative overflow-hidden text-white border-l-4 {{ $theme['spine'] }} select-none shadow-inner">
-                            {{-- Hardcover spine shadow crease --}}
-                            <div class="absolute left-0 top-0 bottom-0 w-3 bg-gradient-to-r from-black/50 via-black/20 to-transparent pointer-events-none"></div>
+                        <div class="h-64 bg-slate-950 relative overflow-hidden select-none border-l-4 {{ $theme['spine'] }} shadow-inner flex flex-col justify-between">
+                            @if ($book->cover_path)
+                                {{-- Real Book Cover Photo --}}
+                                <img src="{{ asset($book->cover_path) }}"
+                                     alt="{{ $book->title }}"
+                                     class="absolute inset-0 w-full h-full object-cover group-hover:scale-105 transition-transform duration-500">
 
-                            {{-- Bookmark ribbon for Available Books --}}
-                            @if (!$book->is_reference && !$isBorrowed)
-                                <div class="absolute top-0 right-4 w-4 h-7 bg-amber-400 shadow-md [clip-path:polygon(0_0,100%_0,100%_100%,50%_75%,0_100%)] z-20"></div>
-                            @endif
+                                {{-- Dark gradient overlays for readability and realism --}}
+                                <div class="absolute inset-0 bg-gradient-to-t from-black/85 via-black/15 to-black/60 pointer-events-none"></div>
 
-                            {{-- Background geometric watermark --}}
-                            <div class="absolute -right-6 -bottom-6 text-white/5 font-black text-9xl pointer-events-none select-none">
-                                📖
-                            </div>
+                                {{-- Hardcover spine shadow crease --}}
+                                <div class="absolute left-0 top-0 bottom-0 w-3 bg-gradient-to-r from-black/70 via-black/30 to-transparent pointer-events-none z-10"></div>
 
-                            {{-- Top Header on Book Cover: Status badge + Year --}}
-                            <div class="flex items-start justify-between z-10 relative">
-                                @if ($book->is_reference)
-                                    <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-amber-400 text-amber-950 shadow-sm">
-                                        🔒 Reference
-                                    </span>
-                                @elseif ($isBorrowed)
-                                    <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-rose-500 text-white shadow-sm">
-                                        ⏳ Borrowed
-                                    </span>
-                                @else
-                                    <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-emerald-400 text-emerald-950 shadow-sm">
-                                        ✓ Available
-                                    </span>
+                                {{-- Bookmark ribbon for Available Books --}}
+                                @if (!$book->is_reference && !$isBorrowed)
+                                    <div class="absolute top-0 right-4 w-4 h-8 bg-amber-400 shadow-md [clip-path:polygon(0_0,100%_0,100%_100%,50%_75%,0_100%)] z-20"></div>
                                 @endif
 
-                                <span class="text-xs text-white/60 font-mono bg-black/30 px-2 py-0.5 rounded-md">
-                                    {{ $book->published_year }}
-                                </span>
-                            </div>
+                                {{-- Top Header on Book Cover: Status badge + Year --}}
+                                <div class="flex items-start justify-between z-10 relative p-4">
+                                    @if ($book->is_reference)
+                                        <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-amber-400 text-amber-950 shadow-md">
+                                            🔒 Reference
+                                        </span>
+                                    @elseif ($isBorrowed)
+                                        <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-rose-600 text-white shadow-md">
+                                            ⏳ Borrowed
+                                        </span>
+                                    @else
+                                        <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-emerald-500 text-white shadow-md">
+                                            ✓ Available
+                                        </span>
+                                    @endif
 
-                            {{-- Center: Book title stylized on jacket --}}
-                            <div class="my-auto z-10 relative py-2 border-y border-white/10">
-                                <h4 class="font-serif font-bold text-white text-base leading-snug line-clamp-2 drop-shadow-sm group-hover:text-amber-200 transition">
-                                    {{ $book->title }}
-                                </h4>
-                                <p class="text-xs {{ $theme['text_accent'] }} mt-1 truncate font-medium">
-                                    by {{ $book->author->name }}
-                                </p>
-                            </div>
+                                    <span class="text-xs text-white font-mono bg-black/60 backdrop-blur-sm px-2 py-0.5 rounded-md shadow-sm">
+                                        {{ $book->published_year }}
+                                    </span>
+                                </div>
 
-                            {{-- Bottom ISBN Bar --}}
-                            <div class="z-10 relative flex items-center justify-between text-[11px] text-white/50 font-mono">
-                                <span>ISBN-13</span>
-                                <span>{{ $book->isbn }}</span>
-                            </div>
+                                {{-- Bottom overlay info on picture --}}
+                                <div class="p-4 z-10 relative mt-auto">
+                                    <h4 class="font-serif font-bold text-white text-sm leading-snug line-clamp-2 drop-shadow-md group-hover:text-amber-200 transition">
+                                        {{ $book->title }}
+                                    </h4>
+                                    <div class="flex items-center justify-between text-[11px] text-white/70 font-mono mt-1">
+                                        <span>ISBN-13</span>
+                                        <span>{{ $book->isbn }}</span>
+                                    </div>
+                                </div>
+                            @else
+                                {{-- Hardcover spine shadow crease --}}
+                                <div class="absolute left-0 top-0 bottom-0 w-3 bg-gradient-to-r from-black/50 via-black/20 to-transparent pointer-events-none"></div>
+
+                                {{-- Bookmark ribbon for Available Books --}}
+                                @if (!$book->is_reference && !$isBorrowed)
+                                    <div class="absolute top-0 right-4 w-4 h-7 bg-amber-400 shadow-md [clip-path:polygon(0_0,100%_0,100%_100%,50%_75%,0_100%)] z-20"></div>
+                                @endif
+
+                                {{-- Background geometric watermark --}}
+                                <div class="absolute -right-6 -bottom-6 text-white/5 font-black text-9xl pointer-events-none select-none">
+                                    📖
+                                </div>
+
+                                {{-- Top Header on Book Cover: Status badge + Year --}}
+                                <div class="flex items-start justify-between z-10 relative p-6">
+                                    @if ($book->is_reference)
+                                        <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-amber-400 text-amber-950 shadow-sm">
+                                            🔒 Reference
+                                        </span>
+                                    @elseif ($isBorrowed)
+                                        <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-rose-500 text-white shadow-sm">
+                                            ⏳ Borrowed
+                                        </span>
+                                    @else
+                                        <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-emerald-400 text-emerald-950 shadow-sm">
+                                            ✓ Available
+                                        </span>
+                                    @endif
+
+                                    <span class="text-xs text-white/60 font-mono bg-black/30 px-2 py-0.5 rounded-md">
+                                        {{ $book->published_year }}
+                                    </span>
+                                </div>
+
+                                {{-- Center: Book title stylized on jacket --}}
+                                <div class="my-auto z-10 relative px-6 py-2 border-y border-white/10">
+                                    <h4 class="font-serif font-bold text-white text-base leading-snug line-clamp-2 drop-shadow-sm group-hover:text-amber-200 transition">
+                                        {{ $book->title }}
+                                    </h4>
+                                    <p class="text-xs {{ $theme['text_accent'] }} mt-1 truncate font-medium">
+                                        by {{ $book->author->name }}
+                                    </p>
+                                </div>
+
+                                {{-- Bottom ISBN Bar --}}
+                                <div class="z-10 relative flex items-center justify-between text-[11px] text-white/50 font-mono px-6 pb-4">
+                                    <span>ISBN-13</span>
+                                    <span>{{ $book->isbn }}</span>
+                                </div>
+                            @endif
                         </div>
 
                         {{-- 📄 Book Details & Bottom Action Bar --}}
