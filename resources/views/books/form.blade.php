@@ -74,9 +74,9 @@
                     <label for="cover_path" class="block text-sm font-bold text-gray-700">Book Cover Image Path or URL (Optional)</label>
                     <input type="text" name="cover_path" id="cover_path"
                            value="{{ old('cover_path', $book->cover_path) }}"
-                           placeholder="e.g. /images/books/book_1.jpg or web image link"
+                           placeholder="e.g. /images/books/isbn_9780132350884.jpg or web image link"
                            class="mt-1 w-full rounded-xl border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 text-sm">
-                    <p class="text-xs text-gray-400 mt-1">Provide a local image path like <code class="bg-gray-100 px-1 py-0.5 rounded">/images/books/book_1.jpg</code> or an external image URL.</p>
+                    <p class="text-xs text-gray-400 mt-1">Provide a local image path like <code class="bg-gray-100 px-1 py-0.5 rounded">/images/books/isbn_9780132350884.jpg</code> or an external image URL.</p>
                 </div>
 
                 {{-- Reference Book Checkbox --}}

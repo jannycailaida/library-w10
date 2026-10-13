@@ -49,7 +49,6 @@ class DatabaseSeeder extends Seeder
         $catalogData = [
             [
                 'author' => 'Robert C. Martin',
-                'cover' => '/images/books/book_1.jpg',
                 'books' => [
                     ['title' => 'Clean Code: A Handbook of Agile Software Craftsmanship', 'isbn' => '9780132350884', 'year' => 2008, 'is_ref' => false],
                     ['title' => 'Clean Architecture: A Craftsman\'s Guide to Software Structure', 'isbn' => '9780134494166', 'year' => 2017, 'is_ref' => false],
@@ -59,7 +58,6 @@ class DatabaseSeeder extends Seeder
             ],
             [
                 'author' => 'Thomas H. Cormen',
-                'cover' => '/images/books/book_1.jpg',
                 'books' => [
                     ['title' => 'Introduction to Algorithms (4th Edition)', 'isbn' => '9780262046305', 'year' => 2022, 'is_ref' => false],
                     ['title' => 'Algorithms Unlocked: A Friendly Guide for Students', 'isbn' => '9780262518802', 'year' => 2013, 'is_ref' => false],
@@ -69,7 +67,6 @@ class DatabaseSeeder extends Seeder
             ],
             [
                 'author' => 'James Stewart',
-                'cover' => '/images/books/book_6.jpg',
                 'books' => [
                     ['title' => 'Calculus: Early Transcendentals (9th Edition)', 'isbn' => '9781337613927', 'year' => 2020, 'is_ref' => false],
                     ['title' => 'Precalculus: Mathematics for Calculus', 'isbn' => '9781305071759', 'year' => 2015, 'is_ref' => false],
@@ -79,7 +76,6 @@ class DatabaseSeeder extends Seeder
             ],
             [
                 'author' => 'Abraham Silberschatz',
-                'cover' => '/images/books/book_1.jpg',
                 'books' => [
                     ['title' => 'Operating System Concepts (10th Edition)', 'isbn' => '9781119456339', 'year' => 2018, 'is_ref' => false],
                     ['title' => 'Database System Concepts (7th Edition)', 'isbn' => '9780078022159', 'year' => 2019, 'is_ref' => false],
@@ -89,7 +85,6 @@ class DatabaseSeeder extends Seeder
             ],
             [
                 'author' => 'Hugh D. Young',
-                'cover' => '/images/books/book_3.jpg',
                 'books' => [
                     ['title' => 'University Physics with Modern Physics (15th Edition)', 'isbn' => '9780135159553', 'year' => 2019, 'is_ref' => false],
                     ['title' => 'Sears and Zemansky\'s College Physics', 'isbn' => '9780134876986', 'year' => 2019, 'is_ref' => false],
@@ -99,7 +94,6 @@ class DatabaseSeeder extends Seeder
             ],
             [
                 'author' => 'Neil A. Campbell',
-                'cover' => '/images/books/book_4.jpg',
                 'books' => [
                     ['title' => 'Campbell Biology: Concepts and Connections (12th Edition)', 'isbn' => '9780135188743', 'year' => 2020, 'is_ref' => false],
                     ['title' => 'Essential Biology with Physiology for Undergraduates', 'isbn' => '9780134764825', 'year' => 2018, 'is_ref' => false],
@@ -109,7 +103,6 @@ class DatabaseSeeder extends Seeder
             ],
             [
                 'author' => 'N. Gregory Mankiw',
-                'cover' => '/images/books/book_6.jpg',
                 'books' => [
                     ['title' => 'Principles of Economics (9th Edition)', 'isbn' => '9780357038314', 'year' => 2020, 'is_ref' => false],
                     ['title' => 'Macroeconomics: Theory and Global Policy', 'isbn' => '9781319105990', 'year' => 2019, 'is_ref' => false],
@@ -119,7 +112,6 @@ class DatabaseSeeder extends Seeder
             ],
             [
                 'author' => 'F. Scott Fitzgerald',
-                'cover' => '/images/books/book_2.jpg',
                 'books' => [
                     ['title' => 'The Great Gatsby: The Original 1925 Classic', 'isbn' => '9780743273565', 'year' => 1925, 'is_ref' => false],
                     ['title' => 'Tender Is the Night: A Romance', 'isbn' => '9780684801544', 'year' => 1934, 'is_ref' => false],
@@ -129,7 +121,6 @@ class DatabaseSeeder extends Seeder
             ],
             [
                 'author' => 'George Orwell',
-                'cover' => '/images/books/book_5.jpg',
                 'books' => [
                     ['title' => '1984: A Dystopian Masterpiece (Annotated Edition)', 'isbn' => '9780451524935', 'year' => 1949, 'is_ref' => false],
                     ['title' => 'Animal Farm: A Fairy Story with Historical Notes', 'isbn' => '9780451526342', 'year' => 1945, 'is_ref' => false],
@@ -139,11 +130,10 @@ class DatabaseSeeder extends Seeder
             ],
             [
                 'author' => 'Oxford Reference Editors',
-                'cover' => '/images/books/book_2.jpg',
                 'books' => [
                     ['title' => 'Oxford Advanced Learner\'s English Dictionary (Reference)', 'isbn' => '9780194798792', 'year' => 2020, 'is_ref' => true],
                     ['title' => 'Oxford Concise Medical Dictionary (Library Reference)', 'isbn' => '9780199687817', 'year' => 2015, 'is_ref' => true],
-                    ['title' => 'The Oxford Handbook of Computer Science and Law (Reference)', 'isbn' => '9780198843498', 'year' => 2021, 'is_ref' => true],
+                    ['title' => 'The Oxford Dictionary of Law (Reference)', 'isbn' => '9780198843498', 'year' => 2021, 'is_ref' => true],
                     ['title' => 'Oxford Encyclopedia of World History & Civilization (Reference)', 'isbn' => '9780199295661', 'year' => 2018, 'is_ref' => true],
                 ],
             ],
@@ -157,13 +147,18 @@ class DatabaseSeeder extends Seeder
             ]);
 
             foreach ($group['books'] as $bookData) {
+                $coverFile = "images/books/isbn_{$bookData['isbn']}.jpg";
+                $coverPath = file_exists(public_path($coverFile))
+                    ? "/{$coverFile}"
+                    : null;
+
                 $book = Book::create([
                     'author_id' => $author->id,
                     'title' => $bookData['title'],
                     'isbn' => $bookData['isbn'],
                     'published_year' => $bookData['year'],
                     'is_reference' => $bookData['is_ref'],
-                    'cover_path' => $group['cover'],
+                    'cover_path' => $coverPath,
                 ]);
 
                 $allBooks->push($book);
