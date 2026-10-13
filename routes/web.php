@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\AdminUserController;
 use App\Http\Controllers\BookController;
+use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\LoanController;
 use App\Http\Controllers\ProfileController;
 use Illuminate\Support\Facades\Route;
@@ -10,9 +11,9 @@ use Illuminate\Support\Facades\Route;
 Route::get('/', fn () => redirect()->route('books.index'));
 
 // Dashboard
-Route::get('/dashboard', function () {
-    return redirect()->route('books.index');
-})->middleware(['auth', 'verified'])->name('dashboard');
+Route::get('/dashboard', [DashboardController::class, 'index'])
+    ->middleware(['auth', 'verified'])
+    ->name('dashboard');
 
 // Authenticated routes
 Route::middleware('auth')->group(function () {
