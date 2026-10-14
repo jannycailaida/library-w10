@@ -1,15 +1,15 @@
 <x-guest-layout>
     {{-- Card Header --}}
-    <div class="mb-6 text-center">
-        <h2 class="text-2xl font-black text-gray-900 tracking-tight">
+    <div class="mb-5">
+        <h2 class="text-2xl font-black text-slate-900 tracking-tight">
             Create Student Account
         </h2>
-        <p class="text-xs text-gray-500 mt-1">
+        <p class="text-xs font-medium text-slate-500 mt-1">
             Register for your free digital library card to borrow textbooks.
         </p>
     </div>
 
-    <form method="POST" action="{{ route('register') }}" class="space-y-4">
+    <form method="POST" action="{{ route('register') }}" class="space-y-3.5">
         @csrf
 
         <!-- Full Name -->
