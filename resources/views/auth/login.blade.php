@@ -1,6 +1,6 @@
 <x-guest-layout>
     {{-- Form Header --}}
-    <div class="mb-5 text-center">
+    <div class="mb-6 text-center">
         <div class="inline-flex items-center space-x-1.5 px-3 py-1 rounded-full bg-indigo-50 border border-indigo-100 text-indigo-700 text-xs font-bold mb-2">
             <span>📚</span>
             <span>LibraryHub Portal</span>
@@ -71,7 +71,7 @@
         </div>
 
         <!-- Submit Button -->
-        <div class="pt-1">
+        <div class="pt-1.5">
             <button type="submit"
                     class="w-full py-3 px-4 bg-indigo-600 hover:bg-indigo-700 text-white font-bold text-sm rounded-xl shadow-md shadow-indigo-600/25 transition transform active:scale-95 flex items-center justify-center space-x-2">
                 <span>Sign In to LibraryHub</span>
@@ -80,37 +80,8 @@
         </div>
     </form>
 
-    {{-- ⚡ Quick Demo Accounts Auto-Filler --}}
-    <div class="mt-5 pt-4 border-t border-slate-100">
-        <div class="text-[11px] font-bold text-slate-400 uppercase tracking-wider text-center mb-2">
-            Quick Fill Demo Accounts (Password: <code class="text-indigo-600 font-mono">password</code>)
-        </div>
-        <div class="grid grid-cols-3 gap-2">
-            <button type="button"
-                    onclick="document.getElementById('email').value='admin@library.test'; document.getElementById('password').value='password';"
-                    class="p-2 rounded-xl bg-purple-50 hover:bg-purple-100 text-purple-700 text-xs font-bold border border-purple-200 transition text-center flex flex-col items-center">
-                <span class="text-sm">👑</span>
-                <span>Admin</span>
-            </button>
-
-            <button type="button"
-                    onclick="document.getElementById('email').value='librarian@library.test'; document.getElementById('password').value='password';"
-                    class="p-2 rounded-xl bg-blue-50 hover:bg-blue-100 text-blue-700 text-xs font-bold border border-blue-200 transition text-center flex flex-col items-center">
-                <span class="text-sm">📚</span>
-                <span>Librarian</span>
-            </button>
-
-            <button type="button"
-                    onclick="document.getElementById('email').value='member@library.test'; document.getElementById('password').value='password';"
-                    class="p-2 rounded-xl bg-emerald-50 hover:bg-emerald-100 text-emerald-700 text-xs font-bold border border-emerald-200 transition text-center flex flex-col items-center">
-                <span class="text-sm">🎓</span>
-                <span>Student</span>
-            </button>
-        </div>
-    </div>
-
     {{-- Register link & live count footer --}}
-    <div class="mt-4 pt-3.5 border-t border-slate-100 flex items-center justify-between text-xs text-slate-500">
+    <div class="mt-6 pt-4 border-t border-slate-100 flex items-center justify-between text-xs text-slate-500">
         <span class="inline-flex items-center space-x-1.5 text-emerald-700 font-semibold text-[11px]">
             <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
             <span>26 books available now</span>
