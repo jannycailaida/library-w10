@@ -1,110 +1,89 @@
 <x-guest-layout>
-    {{-- Card Header --}}
-    <div class="mb-6 text-center">
-        <h2 class="text-2xl font-black text-gray-900 tracking-tight">
+    {{-- Compact Header with Integrated Logo --}}
+    <div class="text-center mb-3.5">
+        <div class="inline-flex items-center space-x-1.5 px-3 py-1 rounded-full bg-indigo-50 border border-indigo-100 text-indigo-700 text-xs font-bold mb-1.5">
+            <span>📚</span>
+            <span>Student Registration</span>
+        </div>
+        <h2 class="text-xl sm:text-2xl font-black text-slate-900 tracking-tight">
             Create Student Account
         </h2>
-        <p class="text-xs text-gray-500 mt-1">
-            Register for your free digital library card to borrow textbooks.
+        <p class="text-xs font-medium text-slate-500 mt-0.5">
+            Get your instant digital library card to borrow textbooks.
         </p>
     </div>
 
-    <form method="POST" action="{{ route('register') }}" class="space-y-4">
+    <form method="POST" action="{{ route('register') }}" class="space-y-3">
         @csrf
 
         <!-- Full Name -->
         <div>
-            <label for="name" class="block text-xs font-bold text-gray-700 uppercase tracking-wider mb-1">
-                Full Name
-            </label>
             <div class="relative">
-                <div class="absolute inset-y-0 start-0 flex items-center ps-3.5 pointer-events-none text-gray-400">
-                    <svg class="w-4 h-4" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
-                    </svg>
+                <div class="absolute inset-y-0 start-0 flex items-center ps-3 pointer-events-none text-slate-400 text-xs">
+                    👤
                 </div>
                 <input id="name" type="text" name="name" value="{{ old('name') }}" required autofocus autocomplete="name"
-                       placeholder="e.g. Juan Dela Cruz"
-                       class="w-full ps-10 pe-4 py-2.5 bg-gray-50 border border-gray-200 rounded-xl text-sm focus:bg-white focus:ring-2 focus:ring-indigo-600 focus:border-indigo-600 transition placeholder:text-gray-400 font-medium">
+                       placeholder="Full Name (e.g. Juan Dela Cruz)"
+                       class="w-full ps-9 pe-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs sm:text-sm focus:bg-white focus:ring-2 focus:ring-indigo-600 focus:border-indigo-600 transition placeholder:text-slate-400 font-medium">
             </div>
             <x-input-error :messages="$errors->get('name')" class="mt-1" />
         </div>
 
         <!-- Email Address -->
         <div>
-            <label for="email" class="block text-xs font-bold text-gray-700 uppercase tracking-wider mb-1">
-                Student Email Address
-            </label>
             <div class="relative">
-                <div class="absolute inset-y-0 start-0 flex items-center ps-3.5 pointer-events-none text-gray-400">
-                    <svg class="w-4 h-4" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 12a4 4 0 10-8 0 4 4 0 008 0zm0 0v1.5a2.5 2.5 0 005 0V12a9 9 0 10-9 9m4.5-1.206a8.959 8.959 0 01-4.5 1.207" />
-                    </svg>
+                <div class="absolute inset-y-0 start-0 flex items-center ps-3 pointer-events-none text-slate-400 text-xs">
+                    📧
                 </div>
                 <input id="email" type="email" name="email" value="{{ old('email') }}" required autocomplete="username"
-                       placeholder="student@university.edu"
-                       class="w-full ps-10 pe-4 py-2.5 bg-gray-50 border border-gray-200 rounded-xl text-sm focus:bg-white focus:ring-2 focus:ring-indigo-600 focus:border-indigo-600 transition placeholder:text-gray-400 font-medium">
+                       placeholder="Student Email (student@university.edu)"
+                       class="w-full ps-9 pe-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs sm:text-sm focus:bg-white focus:ring-2 focus:ring-indigo-600 focus:border-indigo-600 transition placeholder:text-slate-400 font-medium">
             </div>
             <x-input-error :messages="$errors->get('email')" class="mt-1" />
         </div>
 
         <!-- Password -->
         <div>
-            <label for="password" class="block text-xs font-bold text-gray-700 uppercase tracking-wider mb-1">
-                Password
-            </label>
             <div class="relative">
-                <div class="absolute inset-y-0 start-0 flex items-center ps-3.5 pointer-events-none text-gray-400">
-                    <svg class="w-4 h-4" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
-                    </svg>
+                <div class="absolute inset-y-0 start-0 flex items-center ps-3 pointer-events-none text-slate-400 text-xs">
+                    🔒
                 </div>
                 <input id="password" type="password" name="password" required autocomplete="new-password"
-                       placeholder="Minimum 8 characters"
-                       class="w-full ps-10 pe-4 py-2.5 bg-gray-50 border border-gray-200 rounded-xl text-sm focus:bg-white focus:ring-2 focus:ring-indigo-600 focus:border-indigo-600 transition placeholder:text-gray-400 font-medium">
+                       placeholder="Password (min 8 chars)"
+                       class="w-full ps-9 pe-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs sm:text-sm focus:bg-white focus:ring-2 focus:ring-indigo-600 focus:border-indigo-600 transition placeholder:text-slate-400 font-medium">
             </div>
             <x-input-error :messages="$errors->get('password')" class="mt-1" />
         </div>
 
         <!-- Confirm Password -->
         <div>
-            <label for="password_confirmation" class="block text-xs font-bold text-gray-700 uppercase tracking-wider mb-1">
-                Confirm Password
-            </label>
             <div class="relative">
-                <div class="absolute inset-y-0 start-0 flex items-center ps-3.5 pointer-events-none text-gray-400">
-                    <svg class="w-4 h-4" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
-                    </svg>
+                <div class="absolute inset-y-0 start-0 flex items-center ps-3 pointer-events-none text-slate-400 text-xs">
+                    🛡️
                 </div>
                 <input id="password_confirmation" type="password" name="password_confirmation" required autocomplete="new-password"
-                       placeholder="Re-enter your password"
-                       class="w-full ps-10 pe-4 py-2.5 bg-gray-50 border border-gray-200 rounded-xl text-sm focus:bg-white focus:ring-2 focus:ring-indigo-600 focus:border-indigo-600 transition placeholder:text-gray-400 font-medium">
+                       placeholder="Confirm Password"
+                       class="w-full ps-9 pe-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs sm:text-sm focus:bg-white focus:ring-2 focus:ring-indigo-600 focus:border-indigo-600 transition placeholder:text-slate-400 font-medium">
             </div>
             <x-input-error :messages="$errors->get('password_confirmation')" class="mt-1" />
         </div>
 
         <!-- Submit Button -->
-        <div class="pt-2">
-            <button type="submit"
-                    class="w-full py-3 px-4 bg-indigo-600 hover:bg-indigo-700 text-white font-bold text-sm rounded-xl shadow-lg shadow-indigo-600/30 transition transform active:scale-95 flex items-center justify-center space-x-2">
-                <span>Complete Student Registration</span>
-                <span>→</span>
-            </button>
-        </div>
+        <button type="submit"
+                class="w-full py-2.5 px-4 bg-gradient-to-r from-indigo-600 to-indigo-700 hover:from-indigo-700 hover:to-indigo-800 text-white font-bold text-xs sm:text-sm rounded-xl shadow-md shadow-indigo-600/25 transition transform active:scale-95 flex items-center justify-center space-x-1.5">
+            <span>Complete Registration</span>
+            <span>→</span>
+        </button>
     </form>
 
-    {{-- Login link footer --}}
-    <div class="mt-6 pt-5 border-t border-gray-100 text-center text-xs text-gray-500">
-        Already registered with LibraryHub?
-        <a href="{{ route('login') }}" class="font-bold text-indigo-600 hover:text-indigo-800 transition ms-1">
+    {{-- Bottom row: Live indicator + Sign in link --}}
+    <div class="mt-4 pt-3 border-t border-slate-100 flex items-center justify-between text-[11px]">
+        <span class="inline-flex items-center space-x-1 text-emerald-700 font-semibold">
+            <span class="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></span>
+            <span>26 books available now</span>
+        </span>
+        <a href="{{ route('login') }}" class="font-bold text-indigo-600 hover:text-indigo-800 transition">
             Sign in here →
         </a>
-    </div>
-
-    {{-- 🟢 Live Available Books Indicator --}}
-    <div class="mt-4 pt-3 border-t border-dashed border-slate-200 flex items-center justify-center space-x-2 text-xs font-semibold text-emerald-700 bg-emerald-50/60 py-2 px-3 rounded-xl border border-emerald-200/60 shadow-xs">
-        <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
-        <span>{{ \App\Models\Book::where('is_reference', false)->whereDoesntHave('members', fn ($q) => $q->whereNull('returned_at'))->count() }} books available now</span>
     </div>
 </x-guest-layout>
