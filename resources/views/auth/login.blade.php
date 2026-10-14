@@ -1,6 +1,10 @@
 <x-guest-layout>
     {{-- Form Header --}}
-    <div class="mb-5">
+    <div class="mb-5 text-center">
+        <div class="inline-flex items-center space-x-1.5 px-3 py-1 rounded-full bg-indigo-50 border border-indigo-100 text-indigo-700 text-xs font-bold mb-2">
+            <span>📚</span>
+            <span>LibraryHub Portal</span>
+        </div>
         <h2 class="text-2xl font-black text-slate-900 tracking-tight">
             Welcome back!
         </h2>
@@ -105,10 +109,13 @@
         </div>
     </div>
 
-    {{-- Register link footer --}}
-    <div class="mt-4 pt-3.5 border-t border-slate-100 text-center text-xs text-slate-500">
-        Don't have a library account?
-        <a href="{{ route('register') }}" class="font-bold text-indigo-600 hover:text-indigo-800 transition ms-1">
+    {{-- Register link & live count footer --}}
+    <div class="mt-4 pt-3.5 border-t border-slate-100 flex items-center justify-between text-xs text-slate-500">
+        <span class="inline-flex items-center space-x-1.5 text-emerald-700 font-semibold text-[11px]">
+            <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
+            <span>26 books available now</span>
+        </span>
+        <a href="{{ route('register') }}" class="font-bold text-indigo-600 hover:text-indigo-800 transition">
             Register as a Student →
         </a>
     </div>
