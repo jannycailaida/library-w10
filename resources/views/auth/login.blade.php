@@ -1,11 +1,15 @@
 <x-guest-layout>
-    {{-- Card Header --}}
+    {{-- Card Header with requested Tagline --}}
     <div class="mb-6 text-center">
-        <h2 class="text-2xl font-black text-gray-900 tracking-tight">
-            Library Account Login
+        <span class="inline-flex items-center space-x-1.5 px-3 py-1 rounded-full text-[11px] font-bold uppercase tracking-wider bg-indigo-50 text-indigo-700 border border-indigo-200/80 mb-2">
+            <span>✦</span>
+            <span>University Digital Library</span>
+        </span>
+        <h2 class="text-2xl font-black text-slate-900 tracking-tight">
+            Welcome back!
         </h2>
-        <p class="text-xs text-gray-500 mt-1">
-            Access your university book loans and staff circulation desk.
+        <p class="text-sm font-semibold bg-gradient-to-r from-indigo-700 via-indigo-600 to-purple-600 bg-clip-text text-transparent mt-1">
+            Your next book is waiting.
         </p>
     </div>
 
@@ -111,5 +115,11 @@
         <a href="{{ route('register') }}" class="font-bold text-indigo-600 hover:text-indigo-800 transition ms-1">
             Register as a Student →
         </a>
+    </div>
+
+    {{-- 🟢 Live Available Books Indicator (Requested) --}}
+    <div class="mt-4 pt-3 border-t border-dashed border-slate-200 flex items-center justify-center space-x-2 text-xs font-semibold text-emerald-700 bg-emerald-50/60 py-2 px-3 rounded-xl border border-emerald-200/60 shadow-xs">
+        <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
+        <span>{{ \App\Models\Book::where('is_reference', false)->whereDoesntHave('members', fn ($q) => $q->whereNull('returned_at'))->count() }} books available now</span>
     </div>
 </x-guest-layout>

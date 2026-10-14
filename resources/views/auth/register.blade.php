@@ -101,4 +101,10 @@
             Sign in here →
         </a>
     </div>
+
+    {{-- 🟢 Live Available Books Indicator --}}
+    <div class="mt-4 pt-3 border-t border-dashed border-slate-200 flex items-center justify-center space-x-2 text-xs font-semibold text-emerald-700 bg-emerald-50/60 py-2 px-3 rounded-xl border border-emerald-200/60 shadow-xs">
+        <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
+        <span>{{ \App\Models\Book::where('is_reference', false)->whereDoesntHave('members', fn ($q) => $q->whereNull('returned_at'))->count() }} books available now</span>
+    </div>
 </x-guest-layout>
