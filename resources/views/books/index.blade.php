@@ -55,99 +55,99 @@
             @endif
         @endauth
 
-        {{-- 🏛️ Modern Hero Banner --}}
-        <div class="relative rounded-3xl overflow-hidden bg-gradient-to-br from-slate-950 via-indigo-950 to-slate-900 text-white p-8 sm:p-12 mb-8 shadow-xl border border-indigo-900/40">
+        {{-- 🏛️ Modern Hero Banner (Clean Academic Light Aesthetic) --}}
+        <div class="relative rounded-3xl overflow-hidden bg-gradient-to-br from-white via-indigo-50/50 to-slate-50 text-slate-900 p-8 sm:p-12 mb-8 shadow-sm border border-slate-200/90">
             {{-- Background decorative ambient lights --}}
-            <div class="absolute -right-16 -top-16 w-80 h-80 rounded-full bg-indigo-500/20 blur-3xl pointer-events-none"></div>
-            <div class="absolute right-1/4 -bottom-20 w-80 h-80 rounded-full bg-purple-500/15 blur-3xl pointer-events-none"></div>
-            <div class="absolute left-1/3 top-0 w-60 h-60 rounded-full bg-emerald-500/10 blur-3xl pointer-events-none"></div>
+            <div class="absolute -right-16 -top-16 w-80 h-80 rounded-full bg-indigo-200/30 blur-3xl pointer-events-none"></div>
+            <div class="absolute right-1/4 -bottom-20 w-80 h-80 rounded-full bg-purple-200/25 blur-3xl pointer-events-none"></div>
+            <div class="absolute left-1/3 top-0 w-60 h-60 rounded-full bg-sky-200/20 blur-3xl pointer-events-none"></div>
 
             <div class="relative z-10 flex flex-col lg:flex-row lg:items-center lg:justify-between gap-8">
                 <div class="max-w-2xl">
-                    <div class="inline-flex items-center space-x-2 px-3 py-1 rounded-full bg-indigo-500/20 border border-indigo-400/30 text-indigo-300 text-xs font-semibold uppercase tracking-wider mb-4">
-                        <span>✦</span>
+                    <div class="inline-flex items-center space-x-2 px-3.5 py-1.5 rounded-full bg-indigo-100/70 border border-indigo-200 text-indigo-800 text-xs font-bold uppercase tracking-wider mb-4 shadow-xs">
+                        <span class="text-indigo-600">✦</span>
                         <span>The Digital Library System</span>
                     </div>
 
-                    <h1 class="text-3xl sm:text-5xl font-extrabold tracking-tight text-white leading-tight">
-                        Discover, Borrow & <br class="hidden sm:inline">Expand Your Mind.
+                    <h1 class="text-3xl sm:text-5xl font-extrabold tracking-tight text-slate-900 leading-tight">
+                        Discover, Borrow & <br class="hidden sm:inline"><span class="bg-gradient-to-r from-indigo-700 via-indigo-600 to-violet-600 bg-clip-text text-transparent">Expand Your Mind.</span>
                     </h1>
 
-                    <p class="mt-4 text-base sm:text-lg text-indigo-200/80 leading-relaxed">
+                    <p class="mt-4 text-base sm:text-lg text-slate-600 leading-relaxed font-normal">
                         Access our curated collection of literature, computer science, and reference volumes. Borrow books instantly with your student card.
                     </p>
 
                     {{-- Live Stats Bar --}}
-                    <div class="mt-8 flex flex-wrap items-center gap-4 sm:gap-8 pt-6 border-t border-white/10 text-xs sm:text-sm">
-                        <div class="flex items-center space-x-2">
+                    <div class="mt-8 flex flex-wrap items-center gap-4 sm:gap-8 pt-6 border-t border-slate-200/80 text-xs sm:text-sm">
+                        <div class="flex items-center space-x-2.5">
                             <span class="text-xl">📚</span>
                             <div>
-                                <span class="font-black text-white text-base">{{ $totalBooks }}</span>
-                                <span class="text-indigo-300 block text-xs">Total Titles</span>
+                                <span class="font-black text-slate-900 text-base">{{ $totalBooks }}</span>
+                                <span class="text-slate-500 block text-xs font-semibold">Total Titles</span>
                             </div>
                         </div>
 
-                        <div class="h-8 w-px bg-white/10 hidden sm:block"></div>
+                        <div class="h-8 w-px bg-slate-200 hidden sm:block"></div>
 
-                        <div class="flex items-center space-x-2">
-                            <span class="w-2.5 h-2.5 rounded-full bg-emerald-400 animate-pulse"></span>
+                        <div class="flex items-center space-x-2.5">
+                            <span class="w-2.5 h-2.5 rounded-full bg-emerald-500 animate-pulse"></span>
                             <div>
-                                <span class="font-black text-emerald-300 text-base">{{ $availableCount }}</span>
-                                <span class="text-indigo-300 block text-xs">Available Now</span>
+                                <span class="font-black text-emerald-700 text-base">{{ $availableCount }}</span>
+                                <span class="text-slate-500 block text-xs font-semibold">Available Now</span>
                             </div>
                         </div>
 
-                        <div class="h-8 w-px bg-white/10 hidden sm:block"></div>
+                        <div class="h-8 w-px bg-slate-200 hidden sm:block"></div>
 
-                        <div class="flex items-center space-x-2">
+                        <div class="flex items-center space-x-2.5">
                             <span class="text-xl">🔒</span>
                             <div>
-                                <span class="font-black text-amber-300 text-base">{{ $referenceCount }}</span>
-                                <span class="text-indigo-300 block text-xs">Reference Books</span>
+                                <span class="font-black text-amber-800 text-base">{{ $referenceCount }}</span>
+                                <span class="text-slate-500 block text-xs font-semibold">Reference Books</span>
                             </div>
                         </div>
 
-                        <div class="h-8 w-px bg-white/10 hidden sm:block"></div>
+                        <div class="h-8 w-px bg-slate-200 hidden sm:block"></div>
 
-                        <div class="flex items-center space-x-2">
+                        <div class="flex items-center space-x-2.5">
                             <span class="text-xl">👥</span>
                             <div>
-                                <span class="font-black text-purple-300 text-base">{{ $totalMembers }}</span>
-                                <span class="text-indigo-300 block text-xs">Library Members</span>
+                                <span class="font-black text-indigo-700 text-base">{{ $totalMembers }}</span>
+                                <span class="text-slate-500 block text-xs font-semibold">Library Members</span>
                             </div>
                         </div>
                     </div>
                 </div>
 
-                {{-- 📚 Right Side: 3D Floating Book Showcase with Glow --}}
+                {{-- 📚 Right Side: 3D Floating Book Showcase with Natural Soft Shadows --}}
                 <div class="relative shrink-0 flex flex-col items-center lg:items-end justify-center pt-8 lg:pt-0">
-                    {{-- Ambient circular glow behind the book stack --}}
-                    <div class="absolute w-72 h-72 rounded-full bg-gradient-to-tr from-indigo-500/25 via-purple-500/25 to-pink-500/15 blur-3xl pointer-events-none"></div>
+                    {{-- Ambient circular soft glow behind the book stack --}}
+                    <div class="absolute w-72 h-72 rounded-full bg-gradient-to-tr from-indigo-200/50 via-purple-200/40 to-pink-200/30 blur-3xl pointer-events-none"></div>
 
                     {{-- 3D Overlapping Floating Book Stack --}}
                     <div class="relative flex items-center justify-center py-6 px-4 [perspective:1000px] select-none group">
 
                         {{-- Floating Top Pill --}}
-                        <div class="absolute -top-1 right-2 z-30 inline-flex items-center space-x-1.5 px-3 py-1 rounded-full bg-white/15 backdrop-blur-md border border-white/25 text-white text-[11px] font-bold shadow-lg shadow-black/30">
-                            <span class="text-amber-300">✦</span>
+                        <div class="absolute -top-1 right-2 z-30 inline-flex items-center space-x-1.5 px-3 py-1 rounded-full bg-white/95 backdrop-blur-md border border-slate-200 text-slate-700 text-[11px] font-bold shadow-md">
+                            <span class="text-amber-500">✦</span>
                             <span>Featured Student Titles</span>
                         </div>
 
                         {{-- Book 1 (Left - Algorithms, tilted -12deg) --}}
                         <div class="relative transform -rotate-12 translate-x-5 hover:-translate-y-2 hover:-rotate-6 transition-all duration-300 z-10 cursor-pointer">
-                            <div class="w-24 sm:w-28 h-36 sm:h-40 rounded-xl overflow-hidden shadow-2xl border-2 border-white/20 bg-slate-900">
+                            <div class="w-24 sm:w-28 h-36 sm:h-40 rounded-xl overflow-hidden shadow-xl shadow-slate-400/25 border-2 border-white bg-slate-100">
                                 <img src="{{ asset('images/books/isbn_9780262046305.jpg') }}"
                                      alt="Introduction to Algorithms"
                                      class="w-full h-full object-cover">
                             </div>
-                            <div class="absolute -bottom-2 -left-2 bg-indigo-900/90 backdrop-blur-sm text-[9px] font-bold text-indigo-200 px-2 py-0.5 rounded-md border border-indigo-400/30 shadow">
+                            <div class="absolute -bottom-2 -left-2 bg-white/95 backdrop-blur-sm text-[9px] font-bold text-indigo-800 px-2 py-0.5 rounded-md border border-indigo-200 shadow-sm">
                                 Algorithms
                             </div>
                         </div>
 
                         {{-- Book 2 (Center - Clean Code, elevated, prominent) --}}
                         <div class="relative transform scale-110 hover:scale-115 -translate-y-2 transition-all duration-300 z-20 cursor-pointer">
-                            <div class="w-28 sm:w-32 h-40 sm:h-48 rounded-2xl overflow-hidden shadow-2xl shadow-indigo-950 border-2 border-amber-400/50 bg-slate-900 relative">
+                            <div class="w-28 sm:w-32 h-40 sm:h-48 rounded-2xl overflow-hidden shadow-2xl shadow-indigo-950/20 border-2 border-amber-400 bg-white relative">
                                 <img src="{{ asset('images/books/isbn_9780132350884.jpg') }}"
                                      alt="Clean Code"
                                      class="w-full h-full object-cover">
@@ -161,19 +161,19 @@
 
                         {{-- Book 3 (Right - Calculus, tilted +12deg) --}}
                         <div class="relative transform rotate-12 -translate-x-5 hover:-translate-y-2 hover:rotate-6 transition-all duration-300 z-10 cursor-pointer">
-                            <div class="w-24 sm:w-28 h-36 sm:h-40 rounded-xl overflow-hidden shadow-2xl border-2 border-white/20 bg-slate-900">
+                            <div class="w-24 sm:w-28 h-36 sm:h-40 rounded-xl overflow-hidden shadow-xl shadow-slate-400/25 border-2 border-white bg-slate-100">
                                 <img src="{{ asset('images/books/isbn_9781337613927.jpg') }}"
                                      alt="Calculus"
                                      class="w-full h-full object-cover">
                             </div>
-                            <div class="absolute -bottom-2 -right-2 bg-purple-900/90 backdrop-blur-sm text-[9px] font-bold text-purple-200 px-2 py-0.5 rounded-md border border-purple-400/30 shadow">
+                            <div class="absolute -bottom-2 -right-2 bg-white/95 backdrop-blur-sm text-[9px] font-bold text-purple-800 px-2 py-0.5 rounded-md border border-purple-200 shadow-sm">
                                 Calculus
                             </div>
                         </div>
 
                         {{-- Floating Bottom Pill --}}
-                        <div class="absolute -bottom-2 left-2 z-30 inline-flex items-center space-x-1.5 px-3 py-1 rounded-full bg-slate-900/90 backdrop-blur-md border border-emerald-400/40 text-emerald-300 text-[11px] font-bold shadow-xl">
-                            <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
+                        <div class="absolute -bottom-2 left-2 z-30 inline-flex items-center space-x-1.5 px-3 py-1 rounded-full bg-white/95 backdrop-blur-md border border-emerald-300 text-emerald-800 text-[11px] font-bold shadow-md">
+                            <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
                             <span>14-Day Free Loan</span>
                         </div>
                     </div>
@@ -182,7 +182,7 @@
                     @can('create', App\Models\Book::class)
                         <div class="mt-4 z-20">
                             <a href="{{ route('books.create') }}"
-                               class="inline-flex items-center space-x-2 px-5 py-2.5 bg-indigo-600 hover:bg-indigo-500 text-white font-bold text-xs rounded-xl shadow-lg shadow-indigo-600/30 transition transform hover:-translate-y-0.5 active:translate-y-0 border border-indigo-400/30">
+                               class="inline-flex items-center space-x-2 px-5 py-2.5 bg-indigo-600 hover:bg-indigo-700 text-white font-bold text-xs rounded-xl shadow-md shadow-indigo-600/20 transition transform hover:-translate-y-0.5 active:translate-y-0">
                                 <span class="text-base">+</span>
                                 <span>Add New Book to Shelf</span>
                             </a>
