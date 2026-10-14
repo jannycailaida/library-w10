@@ -22,7 +22,7 @@
             </div>
         @endif
 
-        {{-- 👤 Personalized Student Welcome Banner (Authenticated Members Only) --}}
+        {{-- 👤 Personalized Student / Guest Welcome Banner --}}
         @auth
             @if(auth()->user()->isMember())
                 <div class="mb-6 bg-gradient-to-r from-indigo-50 via-purple-50 to-pink-50 border border-indigo-100 rounded-2xl p-4 flex flex-col sm:flex-row sm:items-center justify-between gap-3 shadow-sm">
@@ -53,6 +53,30 @@
                     </div>
                 </div>
             @endif
+        @else
+            <div class="mb-6 bg-gradient-to-r from-slate-900 via-indigo-950 to-slate-900 text-white rounded-2xl p-4 sm:p-5 flex flex-col sm:flex-row sm:items-center justify-between gap-4 shadow-sm border border-indigo-900/50">
+                <div class="flex items-center space-x-3">
+                    <span class="w-10 h-10 rounded-xl bg-white/10 text-white flex items-center justify-center text-lg font-bold backdrop-blur-sm">
+                        📚
+                    </span>
+                    <div>
+                        <div class="text-sm font-bold text-white">
+                            Student & Faculty Digital Access
+                        </div>
+                        <div class="text-xs text-indigo-200/80">
+                            Registered students can borrow textbooks directly for 14 days with zero late fees.
+                        </div>
+                    </div>
+                </div>
+                <div class="flex items-center space-x-2 shrink-0">
+                    <a href="{{ route('login') }}" class="px-3.5 py-1.5 bg-white/10 hover:bg-white/20 text-white text-xs font-semibold rounded-xl transition">
+                        Log In
+                    </a>
+                    <a href="{{ route('register') }}" class="px-3.5 py-1.5 bg-indigo-500 hover:bg-indigo-600 text-white text-xs font-bold rounded-xl shadow-md transition">
+                        Register Free
+                    </a>
+                </div>
+            </div>
         @endauth
 
         {{-- 🏛️ Modern Hero Banner --}}
