@@ -468,8 +468,18 @@
                                     <span>→</span>
                                 </button>
 
-                                @auth
-                                    @if (!$book->is_reference && !$isBorrowed)
+                                @if ($book->is_reference)
+                                    <span class="text-xs font-semibold text-amber-700/80 flex items-center space-x-1">
+                                        <span>🔒</span>
+                                        <span>Library Use Only</span>
+                                    </span>
+                                @elseif ($isBorrowed)
+                                    <span class="text-xs font-medium text-slate-400 flex items-center space-x-1.5">
+                                        <span class="w-1.5 h-1.5 rounded-full bg-slate-300"></span>
+                                        <span>Currently on loan</span>
+                                    </span>
+                                @else
+                                    @auth
                                         <form method="POST" action="{{ route('books.borrow', $book) }}">
                                             @csrf
                                             <button type="submit"
@@ -478,34 +488,12 @@
                                                 <span>Borrow</span>
                                             </button>
                                         </form>
-                                    @elseif ($book->is_reference)
-                                        <span class="inline-flex items-center space-x-1 px-3 py-1.5 text-xs font-bold bg-amber-100 text-amber-900 border border-amber-300 rounded-xl">
-                                            <span>🔒</span>
-                                            <span>Reference</span>
-                                        </span>
-                                    @elseif ($isBorrowed)
-                                        <span class="inline-flex items-center space-x-1 px-3 py-1.5 text-xs font-bold bg-rose-100 text-rose-800 border border-rose-300 rounded-xl">
-                                            <span>⏳</span>
-                                            <span>Borrowed</span>
-                                        </span>
-                                    @endif
-                                @else
-                                    @if ($book->is_reference)
-                                        <span class="inline-flex items-center space-x-1 px-3 py-1.5 text-xs font-bold bg-amber-100 text-amber-900 border border-amber-300 rounded-xl">
-                                            <span>🔒</span>
-                                            <span>Reference</span>
-                                        </span>
-                                    @elseif ($isBorrowed)
-                                        <span class="inline-flex items-center space-x-1 px-3 py-1.5 text-xs font-bold bg-rose-100 text-rose-800 border border-rose-300 rounded-xl">
-                                            <span>⏳</span>
-                                            <span>Borrowed</span>
-                                        </span>
                                     @else
                                         <a href="{{ route('login') }}" class="inline-flex items-center space-x-1 px-3.5 py-1.5 text-xs font-bold text-indigo-700 bg-indigo-50 hover:bg-indigo-100 border border-indigo-200 rounded-xl transition">
                                             <span>Sign In to Borrow</span>
                                         </a>
-                                    @endif
-                                @endauth
+                                    @endauth
+                                @endif
                             </div>
                         </div>
                     </div>
