@@ -3,10 +3,10 @@
         📚
     </div>
     <div class="text-left">
-        <span class="block text-2xl font-black text-white tracking-tight leading-none">
-            Library<span class="text-indigo-400">Hub</span>
+        <span class="block text-2xl font-black text-slate-900 tracking-tight leading-none">
+            Library<span class="text-indigo-600">Hub</span>
         </span>
-        <span class="block text-[11px] font-semibold text-indigo-200/80 mt-1 uppercase tracking-wider">
+        <span class="block text-[11px] font-bold text-slate-500 mt-1 uppercase tracking-wider">
             University Digital Library
         </span>
     </div>

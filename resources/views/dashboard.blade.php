@@ -11,39 +11,39 @@
             </div>
         @endif
 
-        {{-- 🏛️ Hero Welcome Header (Sleek, Full-Width, Consistent with Catalogue) --}}
-        <div class="relative rounded-3xl overflow-hidden bg-gradient-to-br from-slate-950 via-indigo-950 to-slate-900 text-white p-8 sm:p-10 shadow-xl border border-indigo-900/40">
-            <div class="absolute -right-16 -top-16 w-80 h-80 rounded-full bg-indigo-500/20 blur-3xl pointer-events-none"></div>
-            <div class="absolute right-1/3 -bottom-20 w-80 h-80 rounded-full bg-purple-500/15 blur-3xl pointer-events-none"></div>
+        {{-- 🏛️ Hero Welcome Header (Clean Academic Light Aesthetic, Cohesive with Catalogue) --}}
+        <div class="relative rounded-3xl overflow-hidden bg-gradient-to-br from-white via-indigo-50/50 to-slate-50 text-slate-900 p-8 sm:p-10 shadow-sm border border-slate-200/90">
+            <div class="absolute -right-16 -top-16 w-80 h-80 rounded-full bg-indigo-200/30 blur-3xl pointer-events-none"></div>
+            <div class="absolute right-1/3 -bottom-20 w-80 h-80 rounded-full bg-purple-200/25 blur-3xl pointer-events-none"></div>
 
             <div class="relative z-10 flex flex-col md:flex-row md:items-center justify-between gap-6">
                 <div>
-                    <div class="flex items-center space-x-2 mb-3">
-                        <span class="inline-flex items-center space-x-1.5 px-3 py-1 rounded-full text-xs font-semibold uppercase tracking-wider bg-indigo-500/20 text-indigo-300 border border-indigo-400/30">
-                            <span>✦</span>
+                    <div class="flex items-center space-x-2 mb-3 flex-wrap gap-y-2">
+                        <span class="inline-flex items-center space-x-1.5 px-3.5 py-1.5 rounded-full text-xs font-bold uppercase tracking-wider bg-indigo-100/70 text-indigo-800 border border-indigo-200 shadow-xs">
+                            <span class="text-indigo-600">✦</span>
                             <span>Library Management Portal</span>
                         </span>
 
                         @if ($user->isAdmin())
-                            <span class="px-2.5 py-0.5 rounded-full text-xs font-bold bg-purple-500/30 text-purple-200 border border-purple-400/40">
+                            <span class="px-3 py-1 rounded-full text-xs font-bold bg-purple-100 text-purple-800 border border-purple-200 shadow-xs">
                                 👑 System Administrator
                             </span>
                         @elseif ($user->isLibrarian())
-                            <span class="px-2.5 py-0.5 rounded-full text-xs font-bold bg-blue-500/30 text-blue-200 border border-blue-400/40">
+                            <span class="px-3 py-1 rounded-full text-xs font-bold bg-blue-100 text-blue-800 border border-blue-200 shadow-xs">
                                 📚 Librarian Staff
                             </span>
                         @else
-                            <span class="px-2.5 py-0.5 rounded-full text-xs font-bold bg-emerald-500/30 text-emerald-200 border border-emerald-400/40">
+                            <span class="px-3 py-1 rounded-full text-xs font-bold bg-emerald-100 text-emerald-800 border border-emerald-200 shadow-xs">
                                 🎓 Student Cardholder
                             </span>
                         @endif
                     </div>
 
-                    <h1 class="text-3xl sm:text-4xl font-black text-white tracking-tight leading-tight">
-                        Welcome back, {{ $user->name }}! 👋
+                    <h1 class="text-3xl sm:text-4xl font-extrabold text-slate-900 tracking-tight leading-tight">
+                        Welcome back, <span class="bg-gradient-to-r from-indigo-700 via-indigo-600 to-violet-600 bg-clip-text text-transparent">{{ $user->name }}</span>! 👋
                     </h1>
 
-                    <p class="text-indigo-200/80 text-sm mt-2 max-w-2xl leading-relaxed">
+                    <p class="text-slate-600 text-sm sm:text-base mt-2 max-w-2xl leading-relaxed font-normal">
                         @if ($user->hasRole('librarian', 'admin'))
                             You have staff permissions. Manage book circulation, track member loans, and keep university inventory updated.
                         @else
@@ -52,11 +52,11 @@
                     </p>
 
                     @if ($member)
-                        <div class="mt-4 flex items-center space-x-4 text-xs font-mono text-indigo-300">
-                            <span class="bg-white/10 px-3 py-1 rounded-lg border border-white/10">
-                                💳 Card ID: <strong class="text-white font-bold">#{{ str_pad($member->id, 5, '0', STR_PAD_LEFT) }}</strong>
+                        <div class="mt-4 flex items-center space-x-4 text-xs font-mono text-slate-600">
+                            <span class="bg-white/90 px-3 py-1.5 rounded-xl border border-slate-200 shadow-xs">
+                                💳 Card ID: <strong class="text-slate-900 font-bold">#{{ str_pad($member->id, 5, '0', STR_PAD_LEFT) }}</strong>
                             </span>
-                            <span class="text-indigo-200/60 font-sans">
+                            <span class="text-slate-500 font-sans">
                                 Today is {{ now()->format('l, F j, Y') }}
                             </span>
                         </div>
@@ -66,27 +66,27 @@
                 {{-- Quick Header Action Buttons --}}
                 <div class="flex items-center gap-3 flex-wrap shrink-0">
                     <a href="{{ route('books.index') }}"
-                       class="px-5 py-3 bg-indigo-600 hover:bg-indigo-500 text-white font-bold text-xs rounded-2xl shadow-lg shadow-indigo-600/30 transition transform hover:-translate-y-0.5 flex items-center space-x-2">
+                       class="px-5 py-3 bg-indigo-600 hover:bg-indigo-700 text-white font-bold text-xs rounded-2xl shadow-md shadow-indigo-600/20 transition transform hover:-translate-y-0.5 flex items-center space-x-2">
                         <span>📚</span>
                         <span>Browse Catalogue</span>
                     </a>
 
                     @if ($user->hasRole('librarian', 'admin'))
                         <a href="{{ route('desk') }}"
-                           class="px-5 py-3 bg-white/10 hover:bg-white/20 text-white font-bold text-xs rounded-2xl border border-white/20 transition flex items-center space-x-2">
+                           class="px-5 py-3 bg-white hover:bg-slate-50 text-slate-700 font-bold text-xs rounded-2xl border border-slate-200 shadow-sm transition flex items-center space-x-2">
                             <span>🏢</span>
                             <span>Circulation Desk</span>
                         </a>
 
                         @can('create', App\Models\Book::class)
                             <a href="{{ route('books.create') }}"
-                               class="px-4 py-3 bg-white/10 hover:bg-white/20 text-white font-bold text-xs rounded-2xl border border-white/20 transition">
+                               class="px-4 py-3 bg-white hover:bg-slate-50 text-slate-700 font-bold text-xs rounded-2xl border border-slate-200 shadow-sm transition">
                                 <span>+ Add Book</span>
                             </a>
                         @endcan
                     @else
                         <a href="{{ route('my.loans') }}"
-                           class="px-5 py-3 bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs rounded-2xl shadow-lg shadow-emerald-600/30 transition flex items-center space-x-2">
+                           class="px-5 py-3 bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs rounded-2xl shadow-md shadow-emerald-600/20 transition flex items-center space-x-2">
                             <span>📖</span>
                             <span>My Active Loans ({{ $myActiveLoans->count() }})</span>
                         </a>

@@ -15,24 +15,24 @@
         <!-- Scripts -->
         @vite(['resources/css/app.css', 'resources/js/app.js'])
     </head>
-    <body class="font-sans antialiased text-gray-900 bg-slate-950 min-h-screen relative overflow-x-hidden selection:bg-indigo-500 selection:text-white">
+    <body class="font-sans antialiased text-slate-900 bg-gradient-to-br from-slate-50 via-indigo-50/35 to-slate-100 min-h-screen relative overflow-x-hidden selection:bg-indigo-600 selection:text-white">
 
         {{-- Background decorative ambient lights --}}
-        <div class="fixed -right-20 -top-20 w-96 h-96 rounded-full bg-indigo-600/20 blur-3xl pointer-events-none"></div>
-        <div class="fixed left-1/4 -bottom-24 w-96 h-96 rounded-full bg-purple-600/20 blur-3xl pointer-events-none"></div>
-        <div class="fixed -left-20 top-1/3 w-80 h-80 rounded-full bg-blue-600/15 blur-3xl pointer-events-none"></div>
+        <div class="fixed -right-20 -top-20 w-96 h-96 rounded-full bg-indigo-200/40 blur-3xl pointer-events-none"></div>
+        <div class="fixed left-1/4 -bottom-24 w-96 h-96 rounded-full bg-purple-200/35 blur-3xl pointer-events-none"></div>
+        <div class="fixed -left-20 top-1/3 w-80 h-80 rounded-full bg-sky-200/30 blur-3xl pointer-events-none"></div>
 
         <div class="min-h-screen flex flex-col justify-between items-center py-8 px-4 sm:px-6 relative z-10">
 
             {{-- Top Link back to public Catalogue --}}
             <div class="w-full max-w-md flex items-center justify-between">
                 <a href="{{ route('books.index') }}"
-                   class="inline-flex items-center space-x-2 text-xs font-bold text-indigo-300 hover:text-white transition group">
+                   class="inline-flex items-center space-x-2 text-xs font-bold text-slate-600 hover:text-indigo-600 transition group">
                     <span class="transform group-hover:-translate-x-1 transition-transform">←</span>
                     <span>Back to Catalogue</span>
                 </a>
 
-                <div class="text-xs text-indigo-200/60 font-mono">
+                <div class="text-xs text-slate-400 font-mono">
                     Library Auth v3.5
                 </div>
             </div>
@@ -41,19 +41,19 @@
             <div class="w-full sm:max-w-md my-auto py-6">
                 {{-- Logo Header --}}
                 <div class="flex justify-center mb-6">
-                    <a href="{{ route('books.index') }}" class="p-3 bg-white/10 rounded-3xl backdrop-blur-md border border-white/10 hover:border-white/20 transition shadow-lg">
+                    <a href="{{ route('books.index') }}" class="p-3 bg-white/80 rounded-3xl backdrop-blur-md border border-slate-200/80 hover:border-slate-300 transition shadow-sm hover:shadow">
                         <x-application-logo />
                     </a>
                 </div>
 
                 {{-- The Form Card --}}
-                <div class="w-full bg-white rounded-3xl shadow-2xl p-7 sm:p-9 border border-gray-100">
+                <div class="w-full bg-white rounded-3xl shadow-xl shadow-slate-200/70 p-7 sm:p-9 border border-slate-200/80">
                     {{ $slot }}
                 </div>
             </div>
 
             {{-- Footer Note --}}
-            <div class="text-center text-xs text-indigo-200/50 pb-2">
+            <div class="text-center text-xs text-slate-500 pb-2">
                 &copy; {{ date('Y') }} LibraryHub Digital System &bull; University Coursework
             </div>
         </div>
