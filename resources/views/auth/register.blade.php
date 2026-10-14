@@ -1,14 +1,10 @@
 <x-guest-layout>
     {{-- Card Header --}}
     <div class="mb-5 text-center">
-        <div class="inline-flex items-center space-x-1.5 px-3 py-1 rounded-full bg-indigo-50 border border-indigo-100 text-indigo-700 text-xs font-bold mb-2">
-            <span>🎓</span>
-            <span>Student Registration</span>
-        </div>
         <h2 class="text-2xl font-black text-slate-900 tracking-tight">
             Create Account
         </h2>
-        <p class="text-xs font-medium text-slate-500 mt-1">
+        <p class="text-xs font-medium text-slate-500 mt-1.5">
             Register for your free digital library card to borrow textbooks.
         </p>
     </div>
