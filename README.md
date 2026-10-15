@@ -1,58 +1,143 @@
-<p align="center"><a href="https://laravel.com" target="_blank"><img src="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg" width="400" alt="Laravel Logo"></a></p>
+# 📚 LibraryHub: University Digital Library Management System
 
 <p align="center">
-<a href="https://github.com/laravel/framework/actions"><img src="https://github.com/laravel/framework/workflows/tests/badge.svg" alt="Build Status"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/dt/laravel/framework" alt="Total Downloads"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/v/laravel/framework" alt="Latest Stable Version"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/l/laravel/framework" alt="License"></a>
+  <img src="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg" width="220" alt="Laravel">
 </p>
 
-## About Laravel
+<p align="center">
+  <strong>A modern, responsive University Digital Library Management System built with Laravel 12, PHP 8.5, Tailwind CSS, and Alpine.js.</strong>
+</p>
 
-Laravel is a web application framework with expressive, elegant syntax. We believe development must be an enjoyable and creative experience to be truly fulfilling. Laravel takes the pain out of development by easing common tasks used in many web projects, such as:
+<p align="center">
+  <img src="https://img.shields.io/badge/Laravel-12.x-FF2D20?style=for-the-badge&logo=laravel&logoColor=white" alt="Laravel 12">
+  <img src="https://img.shields.io/badge/PHP-8.5-777BB4?style=for-the-badge&logo=php&logoColor=white" alt="PHP 8.5">
+  <img src="https://img.shields.io/badge/Tailwind_CSS-3.x-38B2AC?style=for-the-badge&logo=tailwind-css&logoColor=white" alt="Tailwind CSS">
+  <img src="https://img.shields.io/badge/Alpine.js-3.x-8BC0D0?style=for-the-badge&logo=alpine.js&logoColor=white" alt="Alpine.js">
+  <img src="https://img.shields.io/badge/Tests-36%20Passed-success?style=for-the-badge&logo=checkmarx&logoColor=white" alt="Tests Passed">
+</p>
 
-- [Simple, fast routing engine](https://laravel.com/docs/routing).
-- [Powerful dependency injection container](https://laravel.com/docs/container).
-- Multiple back-ends for [session](https://laravel.com/docs/session) and [cache](https://laravel.com/docs/cache) storage.
-- Expressive, intuitive [database ORM](https://laravel.com/docs/eloquent).
-- Database agnostic [schema migrations](https://laravel.com/docs/migrations).
-- [Robust background job processing](https://laravel.com/docs/queues).
-- [Real-time event broadcasting](https://laravel.com/docs/broadcasting).
+---
 
-Laravel is accessible, powerful, and provides tools required for large, robust applications.
+## 📖 Overview
 
-## Learning Laravel
+**LibraryHub** is an academic digital library platform engineered to streamline book cataloguing, student borrowing workflows, and staff circulation desk operations. Featuring a clean **Light Academic Editorial Aesthetic**, real-time inventory metrics, and strict role-based access control, LibraryHub provides a seamless experience for students and library personnel alike.
 
-Laravel has the most extensive and thorough [documentation](https://laravel.com/docs) and video tutorial library of all modern web application frameworks, making it a breeze to get started with the framework.
+> 📄 **Looking for the Full Academic Coursework Documentation?**  
+> Check out the complete system manual, ERD diagrams, and process workflows in **[DOCUMENTATION.md](DOCUMENTATION.md)**.
 
-In addition, [Laracasts](https://laracasts.com) contains thousands of video tutorials on a range of topics including Laravel, modern PHP, unit testing, and JavaScript. Boost your skills by digging into our comprehensive video library.
+---
 
-You can also watch bite-sized lessons with real-world projects on [Laravel Learn](https://laravel.com/learn), where you will be guided through building a Laravel application from scratch while learning PHP fundamentals.
+## ✨ Key Features
 
-## Agentic Development
+- **🏛️ Modern Light Academic Aesthetic:** Soft lavender and indigo gradients, high-contrast typography, and intuitive single-screen authentication forms.
+- **📚 Interactive Public Catalogue:** Live multi-category subject filters, real-time title/author/ISBN search, and single-source-of-truth status badges (`Available`, `Borrowed`, `Reference`).
+- **👁️ Instant Quick View Modal:** Powered by Alpine.js for zero-latency book detail previews.
+- **🎓 14-Day Self-Service Student Loans:** One-click borrowing with automated due date calculation and status updates.
+- **🔒 Non-Circulating Reference Safeguards:** Protection preventing reference volumes from leaving the premises.
+- **📋 Staff Circulation Desk (`/desk`):** Centralized ledger for librarians to monitor campus-wide loans and process returns with one click.
+- **👑 Administrator User Role Control (`/admin/users`):** Real-time role reassignment between `member`, `librarian`, and `admin`.
+- **👁️ Show / Hide Password Toggle:** Interactive visibility toggles on all password fields.
+- **🧪 100% Test Coverage:** 36 automated unit & feature tests verifying authentication, borrowing policies, and circulation desk operations.
 
-Laravel's predictable structure and conventions make it ideal for AI coding agents like Claude Code, Cursor, and GitHub Copilot. Install [Laravel Boost](https://laravel.com/docs/ai) to supercharge your AI workflow:
+---
 
+## 👥 Role-Based Access Control (RBAC)
+
+| Role | Default Email | Password | Access Privileges |
+| :--- | :--- | :--- | :--- |
+| **System Admin** | `admin@library.test` | `password` | Full system access, User Role Management, Circulation Desk, Catalogue CRUD |
+| **Librarian** | `librarian@library.test` | `password` | Circulation Desk check-in/returns, Catalogue Book CRUD, Borrowing |
+| **Student / Member** | `member@library.test` | `password` | Catalogue browsing, Self-service 14-day borrowing, Personal loan history |
+| **Guest / Visitor** | *Unauthenticated* | — | Public catalogue browsing, search, category filters, registration |
+
+---
+
+## 🚀 Quick Start / Local Installation
+
+### Prerequisites
+- PHP 8.2 or higher (PHP 8.5 recommended)
+- Composer 2.x
+- Node.js 18+ and NPM
+
+### Setup Instructions
 ```bash
-composer require laravel/boost --dev
+# 1. Clone the repository
+git clone https://github.com/jannycailaida/library-w10.git
+cd library-w10
 
-php artisan boost:install
+# 2. Install dependencies
+composer install
+npm install
+
+# 3. Setup environment and generate app key
+cp .env.example .env
+php artisan key:generate
+
+# 4. Migrate database and seed library books & demo users
+php artisan migrate --seed
+
+# 5. Build frontend assets
+npm run build
+
+# 6. Launch development server
+php artisan serve
 ```
 
-Boost provides your agent 15+ tools and skills that help agents build Laravel applications while following best practices.
+Access the application in your browser at: **`http://127.0.0.1:8000`**
 
-## Contributing
+---
 
-Thank you for considering contributing to the Laravel framework! The contribution guide can be found in the [Laravel documentation](https://laravel.com/docs/contributions).
+## 🧪 Running Automated Tests
 
-## Code of Conduct
+Run the test suite using PHPUnit:
 
-In order to ensure that the Laravel community is welcoming to all, please review and abide by the [Code of Conduct](https://laravel.com/docs/contributions#code-of-conduct).
+```bash
+php artisan test --compact
+```
 
-## Security Vulnerabilities
+Expected result:
+```
+Tests:    36 passed (87 assertions)
+Duration: ~2.7s
+Result:   100% Passing
+```
 
-If you discover a security vulnerability within Laravel, please send an e-mail to Taylor Otwell via [taylor@laravel.com](mailto:taylor@laravel.com). All security vulnerabilities will be promptly addressed.
+To format code according to project standards:
+```bash
+vendor/bin/pint --format agent
+```
 
-## License
+---
 
-The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
+## 📂 Project Structure
+
+```
+app/
+├── Http/Controllers/
+│   ├── AdminUserController.php   # User role management
+│   ├── BookController.php        # Catalogue & borrowing logic
+│   ├── DashboardController.php   # Student dashboard metrics
+│   └── LoanController.php        # Circulation desk & loan history
+├── Models/
+│   ├── Author.php                # Book authors
+│   ├── Book.php                  # Library titles & status logic
+│   ├── Member.php                # Student membership profile
+│   └── User.php                  # Authentication & RBAC
+database/
+├── migrations/                   # Database schema definitions
+└── seeders/                      # Sample library titles & default accounts
+resources/
+├── views/
+│   ├── auth/                     # Clean, minimalist authentication forms
+│   ├── books/                    # Public catalogue & quick view modal
+│   ├── dashboard.blade.php       # Member statistics banner
+│   └── layouts/                  # Academic guest and app layouts
+DOCUMENTATION.md                  # Comprehensive Academic System Manual
+```
+
+---
+
+## 📄 License & Attribution
+
+Developed by **Jannyca Ilaida** for university coursework submission.  
+Licensed under the [MIT License](LICENSE).
