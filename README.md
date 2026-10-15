@@ -36,6 +36,8 @@
 - **👁️ Show / Hide Password Toggle:** Available on login, registration, recovery, confirmation, profile, and account-deletion password fields.
 - **🧪 Regression tests:** PHPUnit covers application behavior and authorization. Playwright checks all roles at desktop, laptop, tablet, and mobile widths and exercises complete user workflows.
 - **Record preservation:** Books with loan history cannot be deleted; accounts with active loans must return their books before deletion. Profile changes synchronize the linked library card.
+- **Cover uploads:** Staff can upload a JPG, PNG, or WebP cover up to 2 MB with an immediate preview. Editing without a new file keeps the current cover; replacing or deleting an eligible book removes its previous managed upload.
+- **Add authors while cataloguing:** In Add/Edit book, choose **+ Add a new author** and enter their name. Saving the book adds the author to future selections; an existing matching name is reused. Only librarians and administrators can save these changes.
 
 ---
 
@@ -75,6 +77,7 @@ php artisan key:generate
 
 # 4. Migrate database and seed library books & demo users
 php artisan migrate --seed
+php artisan storage:link
 
 # 5. Build frontend assets
 npm run build
@@ -105,7 +108,7 @@ npm run build
 npm run test:browser
 ```
 
-The browser test server creates and seeds a temporary SQLite database on port 8011. It verifies the connection before migrating and does not borrow, return, edit, or delete records in your configured application database. Browser reports are written to the ignored `playwright-report/` and `test-results/` directories.
+The browser test server creates and seeds a temporary SQLite database on port 8011. It verifies the connection before migrating and isolates uploaded files and session storage in the same temporary workspace. It does not borrow, return, edit, or delete records in your configured application database. Browser reports are written to the ignored `playwright-report/` and `test-results/` directories.
 
 See [AUDIT_REPORT.md](AUDIT_REPORT.md) for the redesign coverage, verified results, documentation conflicts, and remaining limitations. Passing tests are not a claim of 100% code coverage.
 

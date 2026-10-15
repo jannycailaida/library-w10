@@ -11,7 +11,7 @@ The Word project document, README, routes, controllers, models, database schema,
 | `/` | Preserved redirect to the public catalogue. |
 | `/books` | Guest and all authenticated roles; live search, subject/availability filters, sorting, pagination, empty results, book statuses, and Quick View. |
 | `/books/{book}` | Available, borrowed, and reference states; guest sign-in; authenticated borrowing; staff edit/delete controls. |
-| `/books/create`, `/books/{book}/edit` | Shared book form, field feedback, ISBN/year/cover validation, reference restrictions, save/cancel navigation. |
+| `/books/create`, `/books/{book}/edit` | Shared book form, field feedback, ISBN/year validation, optional cover upload with preview, reference restrictions, save/cancel navigation. |
 | `/dashboard` | Separate personal member overview and staff overview; admin management shortcuts are role restricted. |
 | `/my/loans` | Personal history, visible due dates, active/overdue/returned filters, pagination, and empty states. |
 | `/desk` | Staff-only search, status filtering, due dates, returns, pagination, and warnings for existing overlapping active loans. |
@@ -53,6 +53,7 @@ Staff see actual active loan records, overdue returns, available titles, cardhol
 - User management supports search and role filtering; role changes and destructive actions use a consistent confirmation dialog. Administrators cannot change their own role.
 - Registration creates the user and linked member card in one transaction. Profile updates keep card name/email synchronized.
 - Books with circulation history are retained. Account deletion is blocked while books remain on loan, preventing orphaned active borrowing obligations.
+- Staff can upload JPG, PNG, or WebP covers up to 2 MB, preview or cancel the selection, and retain the current cover when editing without a new file. Replacements and eligible book deletions clean up managed uploads; existing local/remote covers remain compatible.
 
 ## 6. Functional issues fixed
 
@@ -66,7 +67,9 @@ Staff see actual active loan records, overdue returns, available titles, cardhol
 | Member dashboard totals mixed personal and library-wide data. | Member metrics and current reading are scoped to that member; staff metrics are explicitly library-wide. |
 | Repeated returns could misrepresent current state. | Atomic conditional update preserves the first timestamp; success now says “Return recorded.” without claiming availability while another legacy loan is active. |
 | Book/account deletion could undermine circulation history or active obligations. | Loan-history and active-borrower guards; account deletion checks run under a user lock. |
-| Public forms accepted non-digit ISBNs or values exceeding current MySQL string columns. | Numeric 13-digit ISBN validation, schema-aligned lengths, and bounded local/http(s) cover paths with field feedback. |
+| Public forms accepted non-digit ISBNs or values exceeding current MySQL string columns. | Numeric 13-digit ISBN validation, schema-aligned lengths, and validated cover uploads with file-type and size feedback. |
+| Cover entry required a manually supplied path or URL. | Optional image picker, immediate preview, public-disk storage with generated filenames, and cover lifecycle checks. Failed updates remove the new upload while preserving the original cover. |
+| Staff could only choose an author already in the list. | Add/Edit book now includes an “Add a new author” option and conditional name field. Authorized book saves resolve an existing matching name or save a new author within the book transaction. Validation failures retain the selection and typed name. |
 | Fresh seeding ignored guarded role assignments and could create multiple active loans for one copy or future return dates. | Explicit factory role states, one active seeded loan per title, and bounded historical return times. The real database was not reseeded. |
 
 ## 7. Documentation compliance and conflicts
@@ -85,11 +88,11 @@ Important source conflicts were handled explicitly:
 ## 8. Testing and validation
 
 - Baseline: 36 PHPUnit tests, 87 assertions passed.
-- Current implementation regression suite: 74 PHPUnit tests, 232 assertions passed, including ownership-policy checks, empty history without a linked card, and rejection of a client-selected borrower ID.
-- Playwright: 27 tests passed after the guideline follow-up. The page matrix covers all four roles at 1440, 1024, 768, and 390 pixels: 124 routed page/role/viewport renders, plus workflow checks. Four additional role tests verify all 32 cells of the Week 10 access matrix using valid CSRF tokens, inspect redirects before following them, and check persisted state. Expected and actual HTTP statuses are attached as per-role JSON logs in the browser report.
+- Current implementation regression suite: 108 PHPUnit tests, 423 assertions passed, including 16 cover-upload cases and 18 author-selection cases covering create/edit, matching-name reuse, validation, retained input, escaping, and unauthorized or rejected writes.
+- Playwright: 27 tests passed after the cover-upload and inline-author follow-ups. The page matrix covers all four roles at 1440, 1024, 768, and 390 pixels: 124 routed page/role/viewport renders, plus workflow checks. Four role tests verify all 32 cells of the Week 10 access matrix using valid CSRF tokens, inspect redirects before following them, and check persisted state. The staff CRUD workflow also verifies new-author creation/editing, field visibility/focus, retained input after validation, PNG upload, JPEG replacement, preview cancellation, preservation without an upload, actual image loading, and file cleanup on replacement/deletion. Expected and actual HTTP statuses are attached as per-role JSON logs in the browser report.
 - Browser workflows: live search and empty results; apostrophe-containing previews; keyboard dismissal/focus restoration; password visibility; restricted routes and 403/404 navigation; registration/verification view; borrow/staff return; book create/edit/confirmed delete; admin role changes/self protection; profile/password updates and confirmed account deletion.
 - Runtime page-error checks passed across the page matrix and preview/search checks. No document horizontal overflow was detected in the tested viewport matrix.
-- Browser writes use a freshly created, guarded temporary SQLite database, never the configured MySQL business database. A connection check runs before test migrations/seeding.
+- Browser writes use a freshly created, guarded temporary SQLite database and isolated upload/session storage. Connection and storage-root checks run before test migrations/seeding. The test router serves uploaded covers from that temporary storage; tests do not depend on the application's public storage link.
 - Current MySQL public catalogue, availability/reference filters, and login were also checked through read-only requests and returned HTTP 200.
 - Business-table counts were unchanged between the preservation checks: 40 books, 31 member cards, 4 users, and 64 loan records. The test server was stopped after browser verification.
 - Production frontend build, Blade compilation, Laravel Pint, and whitespace checks passed. The mechanical UI detector reported no findings; browser and human-style source/screenshot review remain the stronger evidence.
@@ -102,7 +105,7 @@ Final independent review disposition: **PASS**.
 | --- | --- | --- |
 | F1: a return confirmation incorrectly claimed availability when another legacy loan remained active | Resolved | Neutral confirmation and a passing regression proving the other loan stays active and the title remains unavailable. |
 
-The independent reviewer found no remaining material issues in the redesign. That review preceded the later Week 10 guideline follow-up; the follow-up was source reviewed and verified with the full PHPUnit and Playwright suites described above.
+The independent reviewer found no remaining material issues in the redesign. That review preceded the later Week 10 guideline, cover-upload, and inline-author follow-ups; those changes were source reviewed and verified with the full PHPUnit and Playwright suites described above.
 
 ## 9. Remaining issues and operational handoff
 

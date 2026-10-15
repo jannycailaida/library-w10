@@ -19,6 +19,60 @@ Alpine.data('catalogue', () => ({
 window.Alpine = Alpine;
 Alpine.start();
 
+document.querySelectorAll('[data-author-picker]').forEach((container) => {
+    const select = container.querySelector('select');
+    const fields = container.querySelector('[data-new-author]');
+    const input = fields.querySelector('input');
+
+    function updateAuthorField() {
+        const addingAuthor = select.value === 'new';
+        fields.classList.toggle('hidden', !addingAuthor);
+        input.disabled = !addingAuthor;
+        input.required = addingAuthor;
+    }
+
+    updateAuthorField();
+    select.addEventListener('change', () => {
+        updateAuthorField();
+        if (!input.disabled) input.focus();
+    });
+});
+
+document.querySelectorAll('[data-cover-upload]').forEach((container) => {
+    const input = container.querySelector('input[type="file"]');
+    const preview = container.querySelector('[data-cover-preview]');
+    const image = container.querySelector('[data-cover-preview-image]');
+    const filename = container.querySelector('[data-cover-filename]');
+    const reset = container.querySelector('[data-cover-reset]');
+    const currentCover = image.getAttribute('src');
+    let previewUrl;
+
+    function restoreCover() {
+        if (previewUrl) URL.revokeObjectURL(previewUrl);
+        previewUrl = null;
+        if (currentCover) image.src = currentCover;
+        else image.removeAttribute('src');
+        preview.classList.toggle('hidden', !currentCover);
+        filename.textContent = 'Current cover';
+        reset.classList.add('hidden');
+    }
+
+    input.addEventListener('change', () => {
+        restoreCover();
+        const file = input.files[0];
+        if (!file || !['image/jpeg', 'image/png', 'image/webp'].includes(file.type)) return;
+        previewUrl = URL.createObjectURL(file);
+        image.src = previewUrl;
+        filename.textContent = file.name;
+        preview.classList.remove('hidden');
+        reset.classList.remove('hidden');
+    });
+    reset.addEventListener('click', () => {
+        input.value = '';
+        restoreCover();
+    });
+});
+
 const searchForm = document.querySelector('[data-catalogue-search]');
 if (searchForm) {
     let pendingRequest;

@@ -11,9 +11,11 @@ use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Gate;
+use Illuminate\Support\Facades\Storage;
 use Illuminate\Validation\Rule;
 use Illuminate\Validation\ValidationException;
 use Illuminate\View\View;
+use Throwable;
 
 class BookController extends Controller
 {
@@ -85,7 +87,20 @@ class BookController extends Controller
     {
         Gate::authorize('create', Book::class);
 
-        $book = Book::create([...$request->validated(), 'is_reference' => $request->boolean('is_reference')]);
+        $coverPath = $this->storeCover($request);
+
+        try {
+            $book = DB::transaction(fn (): Book => Book::create([
+                ...$request->safe()->except(['cover_image', 'new_author_name']),
+                'author_id' => $this->resolveAuthorId($request),
+                'is_reference' => $request->boolean('is_reference'),
+                'cover_path' => $coverPath,
+            ]));
+        } catch (Throwable $exception) {
+            $this->deleteUploadedCover($coverPath);
+
+            throw $exception;
+        }
 
         return to_route('books.show', $book)->with('status', 'Book added to the catalogue.');
     }
@@ -117,15 +132,33 @@ class BookController extends Controller
     {
         Gate::authorize('update', $book);
 
-        DB::transaction(function () use ($request, $book): void {
-            $lockedBook = Book::whereKey($book->id)->lockForUpdate()->firstOrFail();
+        $coverPath = $this->storeCover($request);
 
-            if ($request->boolean('is_reference') && $lockedBook->isBorrowed()) {
-                throw ValidationException::withMessages(['is_reference' => 'Return the current loan before making this a reference book.']);
-            }
+        try {
+            $previousCoverPath = DB::transaction(function () use ($request, $book, $coverPath): ?string {
+                $lockedBook = Book::whereKey($book->id)->lockForUpdate()->firstOrFail();
 
-            $lockedBook->update([...$request->validated(), 'is_reference' => $request->boolean('is_reference')]);
-        });
+                if ($request->boolean('is_reference') && $lockedBook->isBorrowed()) {
+                    throw ValidationException::withMessages(['is_reference' => 'Return the current loan before making this a reference book.']);
+                }
+
+                $previousCoverPath = $lockedBook->cover_path;
+                $lockedBook->update([
+                    ...$request->safe()->except(['cover_image', 'new_author_name']),
+                    'author_id' => $this->resolveAuthorId($request),
+                    'is_reference' => $request->boolean('is_reference'),
+                    'cover_path' => $coverPath ?? $previousCoverPath,
+                ]);
+
+                return $coverPath !== null ? $previousCoverPath : null;
+            });
+        } catch (Throwable $exception) {
+            $this->deleteUploadedCover($coverPath);
+
+            throw $exception;
+        }
+
+        $this->deleteUploadedCover($previousCoverPath);
 
         return to_route('books.show', $book)->with('status', 'Book details updated.');
     }
@@ -134,17 +167,23 @@ class BookController extends Controller
     {
         Gate::authorize('delete', $book);
 
-        return DB::transaction(function () use ($book): RedirectResponse {
+        $coverPath = null;
+        $response = DB::transaction(function () use ($book, &$coverPath): RedirectResponse {
             $lockedBook = Book::whereKey($book->id)->lockForUpdate()->firstOrFail();
 
             if ($lockedBook->members()->exists()) {
                 return back()->withErrors(['error' => 'Books with loan history cannot be deleted. Keep this record to preserve circulation history.']);
             }
 
+            $coverPath = $lockedBook->cover_path;
             $lockedBook->delete();
 
             return to_route('books.index')->with('status', 'Book removed from the catalogue.');
         });
+
+        $this->deleteUploadedCover($coverPath);
+
+        return $response;
     }
 
     public function borrow(Request $request, Book $book): RedirectResponse
@@ -163,5 +202,36 @@ class BookController extends Controller
         }, 3);
 
         return to_route('my.loans')->with('status', "You borrowed “{$book->title}”. Return it to the circulation desk by ".now()->addDays(14)->format('M j, Y').'.');
+    }
+
+    private function resolveAuthorId(BookRequest $request): int
+    {
+        if ($request->validated('author_id') !== 'new') {
+            return (int) $request->validated('author_id');
+        }
+
+        return Author::firstOrCreate(['name' => $request->validated('new_author_name')])->id;
+    }
+
+    private function storeCover(BookRequest $request): ?string
+    {
+        if (! $request->hasFile('cover_image')) {
+            return null;
+        }
+
+        $path = $request->file('cover_image')->store('book-covers', 'public');
+
+        if ($path === false) {
+            throw ValidationException::withMessages(['cover_image' => 'The cover image could not be saved. Please try again.']);
+        }
+
+        return '/storage/'.$path;
+    }
+
+    private function deleteUploadedCover(?string $coverPath): void
+    {
+        if ($coverPath !== null && preg_match('~\A/storage/book-covers/[a-zA-Z0-9]{40}\.(?:jpe?g|png|webp)\z~', $coverPath)) {
+            Storage::disk('public')->delete(substr($coverPath, strlen('/storage/')));
+        }
     }
 }
