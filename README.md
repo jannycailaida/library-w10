@@ -22,9 +22,6 @@
 
 **LibraryHub** is an academic digital library platform engineered to streamline book cataloguing, student borrowing workflows, and staff circulation desk operations. Featuring a clean **Light Academic Editorial Aesthetic**, real-time inventory metrics, and strict role-based access control, LibraryHub provides a seamless experience for students and library personnel alike.
 
-> 📄 **Looking for the Full Academic Coursework Documentation?**  
-> Check out the complete system manual, ERD diagrams, and process workflows in **[DOCUMENTATION.md](DOCUMENTATION.md)**.
-
 ---
 
 ## ✨ Key Features
@@ -132,7 +129,6 @@ resources/
 │   ├── books/                    # Public catalogue & quick view modal
 │   ├── dashboard.blade.php       # Member statistics banner
 │   └── layouts/                  # Academic guest and app layouts
-DOCUMENTATION.md                  # Comprehensive Academic System Manual
 ```
 
 ---
