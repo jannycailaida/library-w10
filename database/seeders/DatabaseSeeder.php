@@ -17,25 +17,22 @@ class DatabaseSeeder extends Seeder
     public function run(): void
     {
         // 1. Seed one user per role (password: password)
-        $admin = User::create([
+        $admin = User::factory()->admin()->create([
             'name' => 'Admin User',
             'email' => 'admin@library.test',
             'password' => Hash::make('password'),
-            'role' => 'admin',
         ]);
 
-        $librarian = User::create([
+        $librarian = User::factory()->librarian()->create([
             'name' => 'Librarian User',
             'email' => 'librarian@library.test',
             'password' => Hash::make('password'),
-            'role' => 'librarian',
         ]);
 
-        $memberUser = User::create([
+        $memberUser = User::factory()->member()->create([
             'name' => 'Member User',
             'email' => 'member@library.test',
             'password' => Hash::make('password'),
-            'role' => 'member',
         ]);
 
         // Link the member user to a members row
@@ -171,6 +168,7 @@ class DatabaseSeeder extends Seeder
 
         // 4. Seed 1–3 loans per member, with about 20% still unreturned (only non-reference books)
         $borrowableBooks = $allBooks->where('is_reference', false)->values();
+        $activeBookIds = [];
 
         foreach ($allMembers as $m) {
             $loanCount = rand(1, 3);
@@ -178,8 +176,11 @@ class DatabaseSeeder extends Seeder
 
             foreach ($chosenBooks as $b) {
                 $borrowedAt = now()->subDays(rand(2, 30));
-                $isUnreturned = (rand(1, 100) <= 20); // ~20% unreturned
-                $returnedAt = $isUnreturned ? null : (clone $borrowedAt)->addDays(rand(1, 14));
+                $isUnreturned = rand(1, 100) <= 20 && ! isset($activeBookIds[$b->id]);
+                if ($isUnreturned) {
+                    $activeBookIds[$b->id] = true;
+                }
+                $returnedAt = $isUnreturned ? null : (clone $borrowedAt)->addDays(rand(1, 14))->min(now());
 
                 $m->books()->attach($b->id, [
                     'borrowed_at' => $borrowedAt,

@@ -3,9 +3,11 @@
 namespace App\Http\Controllers;
 
 use App\Http\Requests\ProfileUpdateRequest;
+use App\Models\User;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Redirect;
 use Illuminate\View\View;
 
@@ -32,7 +34,11 @@ class ProfileController extends Controller
             $request->user()->email_verified_at = null;
         }
 
-        $request->user()->save();
+        DB::transaction(function () use ($request): void {
+            $user = $request->user();
+            $user->save();
+            $user->member()->update(['name' => $user->name, 'email' => $user->email]);
+        });
 
         return Redirect::route('profile.edit')->with('status', 'profile-updated');
     }
@@ -48,9 +54,23 @@ class ProfileController extends Controller
 
         $user = $request->user();
 
-        Auth::logout();
+        $deleted = DB::transaction(function () use ($user): bool {
+            $lockedUser = User::whereKey($user->id)->lockForUpdate()->firstOrFail();
 
-        $user->delete();
+            if ($lockedUser->member?->activeLoans()->exists()) {
+                return false;
+            }
+
+            $lockedUser->delete();
+
+            return true;
+        });
+
+        if (! $deleted) {
+            return back()->withErrors(['password' => 'Return your borrowed books at the circulation desk before deleting your account.'], 'userDeletion');
+        }
+
+        Auth::logout();
 
         $request->session()->invalidate();
         $request->session()->regenerateToken();

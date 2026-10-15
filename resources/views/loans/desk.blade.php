@@ -1,131 +1,38 @@
 <x-app-layout>
-    <x-slot name="header">
-        <div class="flex items-center justify-between">
-            <div>
-                <h2 class="font-bold text-2xl text-gray-800 leading-tight">
-                    🏢 Circulation Desk
-                </h2>
-                <p class="text-sm text-gray-500 mt-0.5">Staff dashboard: manage active checkouts and process book returns.</p>
-            </div>
-            <div class="flex items-center space-x-2">
-                <span class="px-3 py-1 bg-blue-100 text-blue-700 font-bold text-xs rounded-full">
-                    Active Loans: {{ $activeCount }}
-                </span>
-                <span class="px-3 py-1 bg-gray-100 text-gray-700 font-semibold text-xs rounded-full">
-                    Total Records: {{ $totalCount }}
-                </span>
-            </div>
-        </div>
-    </x-slot>
-
-    <div class="py-8 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        {{-- Flash message / Errors --}}
-        @if (session('status'))
-            <div class="mb-6 p-4 rounded-xl bg-emerald-50 border border-emerald-200 text-emerald-800 flex items-center space-x-2 shadow-sm">
-                <span class="text-emerald-500 text-lg">✓</span>
-                <span>{{ session('status') }}</span>
-            </div>
+    <x-slot name="title">Circulation desk</x-slot>
+    <div class="page-shell">
+        <x-page-heading title="Circulation desk" description="Find a reader’s loan, verify the physical book, then record its return." />
+        <x-feedback />
+        @if ($overlappingBookIds)
+            <div class="alert-warning" role="status">{{ count($overlappingBookIds) }} {{ count($overlappingBookIds) === 1 ? 'title has' : 'titles have' }} more than one active loan. Verify each loan against the physical copy before recording a return. Records that need review are marked below.</div>
         @endif
-
-        {{-- Filter Tabs --}}
-        <div class="flex items-center space-x-2 mb-6">
-            <a href="{{ route('desk', ['status' => 'active']) }}"
-               class="px-4 py-2 text-xs font-bold rounded-xl transition {{ $filter === 'active' ? 'bg-rose-600 text-white shadow-sm' : 'bg-white text-gray-600 hover:bg-gray-100 border border-gray-200' }}">
-                ⏳ Active Loans ({{ $activeCount }})
-            </a>
-            <a href="{{ route('desk', ['status' => 'returned']) }}"
-               class="px-4 py-2 text-xs font-bold rounded-xl transition {{ $filter === 'returned' ? 'bg-emerald-600 text-white shadow-sm' : 'bg-white text-gray-600 hover:bg-gray-100 border border-gray-200' }}">
-                ✓ Returned Records
-            </a>
-            <a href="{{ route('desk', ['status' => 'all']) }}"
-               class="px-4 py-2 text-xs font-bold rounded-xl transition {{ $filter === 'all' ? 'bg-indigo-600 text-white shadow-sm' : 'bg-white text-gray-600 hover:bg-gray-100 border border-gray-200' }}">
-                All Records ({{ $totalCount }})
-            </a>
-        </div>
-
-        {{-- Circulation Desk Table --}}
-        <div class="bg-white rounded-3xl shadow-sm border border-gray-100 overflow-hidden">
-            @if ($loans->isEmpty())
-                <div class="p-12 text-center">
-                    <div class="text-4xl mb-3">✨</div>
-                    <h3 class="text-lg font-bold text-gray-800">No records found</h3>
-                    <p class="text-sm text-gray-500 mt-1">There are no loans matching the selected filter.</p>
-                </div>
-            @else
-                <div class="overflow-x-auto">
-                    <table class="w-full text-left border-collapse">
-                        <thead>
-                            <tr class="bg-gray-50 text-gray-500 text-xs uppercase tracking-wider border-b border-gray-100">
-                                <th class="px-6 py-4 font-semibold">Borrower (Member)</th>
-                                <th class="px-6 py-4 font-semibold">Book Details</th>
-                                <th class="px-6 py-4 font-semibold">Borrowed Date</th>
-                                <th class="px-6 py-4 font-semibold">Status / Return Date</th>
-                                <th class="px-6 py-4 font-semibold text-right">Desk Action</th>
-                            </tr>
-                        </thead>
-                        <tbody class="divide-y divide-gray-100 text-sm">
-                            @foreach ($loans as $loan)
-                                <tr class="hover:bg-gray-50 transition">
-                                    {{-- Member --}}
-                                    <td class="px-6 py-4">
-                                        <div class="font-bold text-gray-900">{{ $loan->member_name }}</div>
-                                        <div class="text-xs text-gray-500">{{ $loan->member_email }}</div>
-                                    </td>
-
-                                    {{-- Book --}}
-                                    <td class="px-6 py-4">
-                                        <a href="{{ route('books.show', $loan->book_id) }}" class="font-bold text-indigo-700 hover:underline">
-                                            {{ $loan->book_title }}
-                                        </a>
-                                        <div class="text-xs text-gray-500 font-normal">by {{ $loan->author_name }} · <span class="font-mono">ISBN: {{ $loan->isbn }}</span></div>
-                                    </td>
-
-                                    {{-- Borrowed At --}}
-                                    <td class="px-6 py-4 text-gray-700">
-                                        {{ \Carbon\Carbon::parse($loan->borrowed_at)->format('M d, Y') }}
-                                        <div class="text-xs text-gray-400">{{ \Carbon\Carbon::parse($loan->borrowed_at)->diffForHumans() }}</div>
-                                    </td>
-
-                                    {{-- Status / Return Date --}}
-                                    <td class="px-6 py-4">
-                                        @if ($loan->returned_at)
-                                            <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-semibold bg-emerald-100 text-emerald-800">
-                                                Returned: {{ \Carbon\Carbon::parse($loan->returned_at)->format('M d, Y') }}
-                                            </span>
-                                        @else
-                                            <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-semibold bg-rose-100 text-rose-800">
-                                                Unreturned
-                                            </span>
-                                        @endif
-                                    </td>
-
-                                    {{-- Desk Action --}}
-                                    <td class="px-6 py-4 text-right">
-                                        @if (! $loan->returned_at)
-                                            <form method="POST" action="{{ route('desk.return', $loan->loan_id) }}" class="inline">
-                                                @csrf
-                                                @method('PATCH')
-                                                <button type="submit"
-                                                        class="px-3.5 py-1.5 bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs rounded-xl shadow-sm transition">
-                                                    ✓ Mark Returned
-                                                </button>
-                                            </form>
-                                        @else
-                                            <span class="text-xs font-medium text-gray-400">Archived</span>
-                                        @endif
-                                    </td>
-                                </tr>
-                            @endforeach
-                        </tbody>
-                    </table>
-                </div>
-
-                {{-- Pagination --}}
-                <div class="p-6 border-t border-gray-100">
-                    {{ $loans->links() }}
-                </div>
-            @endif
-        </div>
+        <div class="mb-5 flex flex-wrap gap-x-5 gap-y-2 text-sm text-stone-600"><p><strong class="text-stone-900">{{ $activeCount }}</strong> on loan</p><p><strong class="{{ $overdueCount ? 'text-red-800' : 'text-stone-900' }}">{{ $overdueCount }}</strong> overdue</p><p><strong class="text-stone-900">{{ $totalCount }}</strong> total loan records</p></div>
+        <form method="GET" action="{{ route('desk') }}" class="panel mb-6 grid items-end gap-4 p-4 sm:grid-cols-[minmax(0,1fr)_12rem_auto]">
+            <div><label class="field-label" for="loan-search">Find a loan</label><input type="search" id="loan-search" name="search" value="{{ $search }}" placeholder="Book, ISBN, reader name, or email" maxlength="255"></div>
+            <div><label class="field-label" for="loan-status">Loan status</label><select id="loan-status" name="status">@foreach (['active' => 'On loan', 'overdue' => 'Overdue', 'returned' => 'Returned', 'all' => 'All records'] as $value => $label)<option value="{{ $value }}" @selected($filter === $value)>{{ $label }}</option>@endforeach</select></div>
+            <button class="btn-primary" type="submit">Find loans</button>
+        </form>
+        <div class="mb-4 flex flex-wrap items-center justify-between gap-3"><h2 class="section-title">{{ $loans->total() }} matching {{ $loans->total() === 1 ? 'loan' : 'loans' }}</h2>@if ($search !== '' || $filter !== 'active')<a href="{{ route('desk') }}" class="btn text-brand-700">Reset view</a>@endif</div>
+        <section class="panel" aria-label="Circulation records">
+            @forelse ($loans as $loan)
+                @php($dueDate = \Carbon\Carbon::parse($loan->borrowed_at)->addDays(14))
+                <article class="record-grid">
+                    @if (!$loan->returned_at && in_array((int) $loan->book_id, $overlappingBookIds, true))<p class="text-sm font-semibold text-amber-900 lg:col-span-4">Review this record: another open loan exists for this title.</p>@endif
+                    <div class="min-w-0"><a href="{{ route('books.show', $loan->book_id) }}" class="font-semibold leading-6 hover:text-brand-700">{{ $loan->book_title }}</a><p class="mt-1 text-sm text-stone-600">{{ $loan->author_name }}</p><p class="mt-1 text-xs tabular-nums text-stone-600">ISBN {{ $loan->isbn }}</p></div>
+                    <div class="min-w-0 text-sm"><p class="font-medium">{{ $loan->member_name }}</p><p class="mt-1 break-all text-stone-600">{{ $loan->member_email }}</p><p class="mt-1 text-xs text-stone-600">Card #{{ $loan->member_id }}</p></div>
+                    <div class="text-sm"><x-loan-status :borrowed-at="$loan->borrowed_at" :returned-at="$loan->returned_at" /><p class="mt-2 font-medium">{{ $loan->returned_at ? 'Returned '.\Carbon\Carbon::parse($loan->returned_at)->format('M j, Y') : 'Due '.$dueDate->format('M j, Y') }}</p><p class="mt-1 text-stone-600">Borrowed {{ \Carbon\Carbon::parse($loan->borrowed_at)->format('M j, Y') }}</p></div>
+                    <div>
+                        @if (!$loan->returned_at)
+                            <form method="POST" action="{{ route('desk.return', $loan->loan_id) }}">@csrf @method('PATCH')<button type="submit" class="btn-primary w-full lg:w-auto" aria-label="Record return of {{ $loan->book_title }} borrowed by {{ $loan->member_name }}">Record return</button></form>
+                        @else
+                            <span class="text-sm text-stone-600">Return recorded</span>
+                        @endif
+                    </div>
+                </article>
+            @empty
+                <x-empty-state title="No loans found" description="Try a different search or status. New loans will appear here when books are borrowed." :href="route('desk', ['status' => 'all'])" action="View all records" />
+            @endforelse
+        </section>
+        <div class="mt-6">{{ $loans->links() }}</div>
     </div>
 </x-app-layout>
-

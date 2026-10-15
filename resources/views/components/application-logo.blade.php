@@ -1,13 +1,4 @@
-<div {{ $attributes->merge(['class' => 'flex items-center space-x-3']) }}>
-    <div class="w-12 h-12 rounded-2xl bg-gradient-to-tr from-indigo-500 via-indigo-600 to-purple-600 flex items-center justify-center text-2xl shadow-lg shadow-indigo-600/40">
-        📚
-    </div>
-    <div class="text-left">
-        <span class="block text-2xl font-black text-slate-900 tracking-tight leading-none">
-            Library<span class="text-indigo-600">Hub</span>
-        </span>
-        <span class="block text-[11px] font-bold text-slate-500 mt-1 uppercase tracking-wider">
-            University Digital Library
-        </span>
-    </div>
-</div>
+<svg {{ $attributes }} viewBox="0 0 32 32" fill="none" aria-hidden="true">
+    <rect width="32" height="32" rx="8" fill="currentColor"/>
+    <path d="M16 10c-3-2-6-2-9-1v14c3-1 6-1 9 1m0-14c3-2 6-2 9-1v14c-3-1-6-1-9 1m0-14v14" stroke="#fff" stroke-width="1.5" stroke-linejoin="round"/>
+</svg>

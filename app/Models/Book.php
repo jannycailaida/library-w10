@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -45,6 +46,10 @@ class Book extends Model
      */
     public function isBorrowed(): bool
     {
+        if (array_key_exists('active_loans_count', $this->attributes)) {
+            return $this->active_loans_count > 0;
+        }
+
         return $this->members()
             ->wherePivotNull('returned_at')
             ->exists();
@@ -59,6 +64,55 @@ class Book extends Model
         return ! $this->is_reference && ! $this->isBorrowed();
     }
 
+    /** @return array<string, array{name: string, authors: list<string>}> */
+    public static function categories(): array
+    {
+        return [
+            'cs' => ['name' => 'Computer science', 'authors' => ['Martin', 'Cormen', 'Silberschatz']],
+            'math' => ['name' => 'Mathematics', 'authors' => ['Stewart']],
+            'physics' => ['name' => 'Physics & engineering', 'authors' => ['Young']],
+            'biology' => ['name' => 'Biology & life sciences', 'authors' => ['Campbell']],
+            'economics' => ['name' => 'Economics & business', 'authors' => ['Mankiw']],
+            'literature' => ['name' => 'Literature & classics', 'authors' => ['Fitzgerald', 'Orwell']],
+            'reference' => ['name' => 'Reference collection', 'authors' => []],
+            'general' => ['name' => 'General studies', 'authors' => []],
+        ];
+    }
+
+    public function scopeAvailable(Builder $query): Builder
+    {
+        return $query->where('is_reference', false)
+            ->whereDoesntHave('members', fn (Builder $loans): Builder => $loans->whereNull('returned_at'));
+    }
+
+    public function scopeInCategory(Builder $query, string $category): Builder
+    {
+        if ($category === 'reference') {
+            return $query->where('is_reference', true);
+        }
+
+        $keywords = self::categories()[$category]['authors'] ?? [];
+        $query->where('is_reference', false);
+
+        if ($category === 'general') {
+            $keywords = array_merge(...array_column(self::categories(), 'authors'));
+
+            return $query->whereHas('author', function (Builder $authors) use ($keywords): void {
+                foreach ($keywords as $keyword) {
+                    $authors->where('name', 'not like', "%{$keyword}%");
+                }
+            });
+        }
+
+        return $query->whereHas('author', function (Builder $authors) use ($keywords): void {
+            $authors->where(function (Builder $names) use ($keywords): void {
+                foreach ($keywords as $keyword) {
+                    $names->orWhere('name', 'like', "%{$keyword}%");
+                }
+            });
+        });
+    }
+
     /**
      * Category slug for filtering.
      */
@@ -68,24 +122,12 @@ class Book extends Model
             return 'reference';
         }
 
-        $author = $this->author?->name ?? '';
-        if (str_contains($author, 'Martin') || str_contains($author, 'Cormen') || str_contains($author, 'Silberschatz')) {
-            return 'cs';
-        }
-        if (str_contains($author, 'Stewart')) {
-            return 'math';
-        }
-        if (str_contains($author, 'Young')) {
-            return 'physics';
-        }
-        if (str_contains($author, 'Campbell')) {
-            return 'biology';
-        }
-        if (str_contains($author, 'Mankiw')) {
-            return 'economics';
-        }
-        if (str_contains($author, 'Fitzgerald') || str_contains($author, 'Orwell')) {
-            return 'literature';
+        foreach (self::categories() as $slug => $category) {
+            foreach ($category['authors'] as $keyword) {
+                if (stripos($this->author?->name ?? '', $keyword) !== false) {
+                    return $slug;
+                }
+            }
         }
 
         return 'general';
@@ -96,32 +138,6 @@ class Book extends Model
      */
     public function getCategoryNameAttribute(): string
     {
-        return match ($this->category_slug) {
-            'cs' => 'Computer Science',
-            'math' => 'Mathematics',
-            'physics' => 'Physics & Engineering',
-            'biology' => 'Biology & Life Sciences',
-            'economics' => 'Economics & Business',
-            'literature' => 'Literature & Classics',
-            'reference' => 'Reference Collection',
-            default => 'General Studies',
-        };
-    }
-
-    /**
-     * Category Icon emoji.
-     */
-    public function getCategoryIconAttribute(): string
-    {
-        return match ($this->category_slug) {
-            'cs' => '💻',
-            'math' => '📐',
-            'physics' => '🔬',
-            'biology' => '🧬',
-            'economics' => '📈',
-            'literature' => '📚',
-            'reference' => '🔒',
-            default => '📖',
-        };
+        return self::categories()[$this->category_slug]['name'];
     }
 }

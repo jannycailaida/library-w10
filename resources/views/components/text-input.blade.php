@@ -1,3 +1,7 @@
 @props(['disabled' => false])
-
-<input @disabled($disabled) {{ $attributes->merge(['class' => 'border-gray-300 focus:border-indigo-500 focus:ring-indigo-500 rounded-md shadow-sm']) }}>
+@php
+    $fieldName = $attributes->get('name');
+    $hasError = $fieldName && $errors->has($fieldName);
+    $description = $attributes->get('aria-describedby', $hasError ? $attributes->get('id', $fieldName).'-error' : null);
+@endphp
+<input @disabled($disabled) {{ $attributes->merge(['class' => 'w-full', 'aria-invalid' => $hasError ? 'true' : 'false', 'aria-describedby' => $description]) }}>

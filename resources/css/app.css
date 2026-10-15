@@ -2,6 +2,57 @@
 @tailwind components;
 @tailwind utilities;
 
-[x-cloak] {
-    display: none !important;
+@layer base {
+    :root { color-scheme: light; }
+    html { @apply bg-stone-50 text-stone-900; }
+    body { @apply font-sans antialiased; font-size: 0.9375rem; }
+    [x-cloak] { display: none !important; }
+    h1, h2, h3 { text-wrap: balance; overflow-wrap: anywhere; }
+    p { text-wrap: pretty; }
+    :focus-visible { outline: 3px solid #39785f; outline-offset: 3px; }
+    input:not([type='checkbox']):not([type='radio']):not([type='hidden']), select, textarea {
+        @apply min-h-[2.75rem] w-full rounded-lg border-stone-300 bg-white text-sm text-stone-900 shadow-none placeholder:text-stone-500 focus:border-brand-600 focus:ring-brand-600;
+    }
+    input[type='checkbox'] { @apply h-4 w-4 rounded border-stone-400 text-brand-700 focus:ring-brand-600; }
+    button, a, input, select { -webkit-tap-highlight-color: transparent; }
+    button:disabled { @apply cursor-wait opacity-60; }
+    dialog { @apply rounded-2xl bg-white p-0 text-stone-900; max-height: calc(100dvh - 2rem); }
+    dialog::backdrop { background: rgb(28 36 31 / 55%); }
+    body:has(dialog[open]) { overflow: hidden; }
+    @media (prefers-reduced-motion: reduce) {
+        *, *::before, *::after { animation-duration: 0.01ms !important; transition-duration: 0.01ms !important; scroll-behavior: auto !important; }
+    }
+}
+@layer components {
+    .page-shell { @apply mx-auto w-full max-w-7xl px-4 py-8 sm:px-6 sm:py-10 lg:px-8; }
+    .page-heading { @apply mb-7 flex flex-col justify-between gap-4 sm:flex-row sm:items-end; }
+    .page-title { @apply font-serif text-3xl font-medium tracking-tight text-stone-900 sm:text-4xl; }
+    .page-description { @apply mt-2 max-w-2xl text-sm leading-6 text-stone-600 sm:text-base; }
+    .panel { @apply rounded-xl border border-stone-200 bg-white; }
+    .btn { @apply inline-flex min-h-[2.75rem] items-center justify-center gap-2 rounded-lg px-4 py-2 text-center text-sm font-semibold transition-colors duration-150; }
+    .btn-primary { @apply btn bg-brand-700 text-white hover:bg-brand-800; }
+    .btn-secondary { @apply btn border border-stone-300 bg-white text-stone-700 hover:bg-stone-100; }
+    .btn-danger { @apply btn border border-red-200 bg-red-50 text-red-800 hover:bg-red-100; }
+    .text-link { @apply font-semibold text-brand-700 underline decoration-brand-200 underline-offset-4 hover:text-brand-900 hover:decoration-brand-700; }
+    .field-label { @apply mb-1.5 block text-sm font-semibold text-stone-800; }
+    .field-help { @apply mt-1.5 text-sm leading-5 text-stone-600; }
+    .badge { @apply inline-flex items-center gap-1.5 rounded-md px-2.5 py-1 text-xs font-semibold; }
+    .badge-available { @apply badge bg-brand-50 text-brand-800; }
+    .badge-active { @apply badge bg-stone-100 text-stone-700; }
+    .badge-reference { @apply badge bg-amber-50 text-amber-900; }
+    .badge-overdue { @apply badge bg-red-50 text-red-800; }
+    .alert { @apply mb-6 rounded-lg border p-4 text-sm leading-6; }
+    .alert-success { @apply alert border-brand-200 bg-brand-50 text-brand-900; }
+    .alert-error { @apply alert border-red-200 bg-red-50 text-red-900; }
+    .alert-warning { @apply alert border-amber-200 bg-amber-50 text-amber-900; }
+    .nav-item { @apply flex min-h-[2.75rem] items-center rounded-lg px-3 py-2 text-sm font-medium text-stone-600 hover:bg-stone-100 hover:text-stone-900; }
+    .nav-active { @apply bg-brand-50 text-brand-800; }
+    .empty-state { @apply px-5 py-12 text-center sm:py-16; }
+    .section-title { @apply text-lg font-semibold tracking-tight text-stone-900; }
+    .record-grid { @apply grid gap-4 p-5 lg:grid-cols-[minmax(0,2fr)_minmax(0,1fr)_minmax(0,1fr)_auto] lg:items-center; overflow-wrap: anywhere; }
+    .record-grid + .record-grid { @apply border-t border-stone-200; }
+    .stat { @apply border-b border-stone-200 px-5 py-5 last:border-b-0 sm:border-b-0 sm:border-r last:sm:border-r-0; }
+    .stat-label { @apply text-sm font-medium text-stone-600; }
+    .stat-value { @apply mt-2 block text-3xl font-semibold tracking-tight tabular-nums text-stone-900; }
+    .skip-link { @apply sr-only focus:not-sr-only focus:fixed focus:left-4 focus:top-3 focus:z-50 focus:rounded-lg focus:bg-brand-800 focus:px-5 focus:py-3 focus:text-white; }
 }

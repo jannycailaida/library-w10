@@ -2,71 +2,61 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\BookRequest;
 use App\Models\Author;
 use App\Models\Book;
-use App\Models\Member;
+use App\Models\User;
+use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Gate;
+use Illuminate\Validation\Rule;
+use Illuminate\Validation\ValidationException;
+use Illuminate\View\View;
 
 class BookController extends Controller
 {
-    /**
-     * Display a listing of books with search and filter.
-     */
-    public function index(Request $request)
+    public function index(Request $request): View
     {
-        $search = $request->query('search');
-        $filter = $request->query('filter');
-        $category = $request->query('category', 'all');
-        $sort = $request->query('sort', 'title_asc');
+        Gate::authorize('viewAny', Book::class);
 
-        $query = Book::with('author')->withCount([
-            'members as active_loans_count' => fn ($q) => $q->whereNull('returned_at'),
+        $categories = Book::categories();
+        $request->validate([
+            'search' => ['nullable', 'string', 'max:255'],
+            'category' => ['nullable', Rule::in(['all', ...array_keys($categories)])],
+            'filter' => ['nullable', Rule::in(['all', 'available', 'borrowed', 'reference'])],
+            'sort' => ['nullable', Rule::in(['title_asc', 'title_desc', 'newest', 'oldest'])],
         ]);
 
-        if ($search) {
-            $query->where(function ($q) use ($search) {
-                $q->where('title', 'like', "%{$search}%")
+        $search = trim($request->string('search')->toString());
+        $filter = $request->input('filter') ?: 'all';
+        $category = $request->input('category') ?: 'all';
+        $sort = $request->input('sort') ?: 'title_asc';
+        $query = Book::with('author')->withCount([
+            'members as active_loans_count' => fn (Builder $loans): Builder => $loans->whereNull('returned_at'),
+        ]);
+
+        if ($search !== '') {
+            $query->where(function (Builder $books) use ($search): void {
+                $books->where('title', 'like', "%{$search}%")
                     ->orWhere('isbn', 'like', "%{$search}%")
-                    ->orWhereHas('author', fn ($aq) => $aq->where('name', 'like', "%{$search}%"));
+                    ->orWhereHas('author', fn (Builder $authors): Builder => $authors->where('name', 'like', "%{$search}%"));
             });
         }
 
         if ($filter === 'available') {
-            $query->where('is_reference', false)
-                ->having('active_loans_count', 0);
+            $query->available();
         } elseif ($filter === 'reference') {
             $query->where('is_reference', true);
+        } elseif ($filter === 'borrowed') {
+            $query->where('is_reference', false)->whereHas('members', fn (Builder $loans): Builder => $loans->whereNull('returned_at'));
         }
 
-        // Category filter
-        if ($category && $category !== 'all') {
-            if ($category === 'reference') {
-                $query->where('is_reference', true);
-            } else {
-                $authorKeywords = match ($category) {
-                    'cs' => ['Martin', 'Cormen', 'Silberschatz'],
-                    'math' => ['Stewart'],
-                    'physics' => ['Young'],
-                    'biology' => ['Campbell'],
-                    'economics' => ['Mankiw'],
-                    'literature' => ['Fitzgerald', 'Orwell'],
-                    default => [],
-                };
-
-                if (! empty($authorKeywords)) {
-                    $query->whereHas('author', function ($aq) use ($authorKeywords) {
-                        $aq->where(function ($sub) use ($authorKeywords) {
-                            foreach ($authorKeywords as $keyword) {
-                                $sub->orWhere('name', 'like', "%{$keyword}%");
-                            }
-                        });
-                    });
-                }
-            }
+        if ($category !== 'all') {
+            $query->inCategory($category);
         }
 
-        // Sorting
         match ($sort) {
             'newest' => $query->orderByDesc('published_year'),
             'oldest' => $query->orderBy('published_year'),
@@ -74,190 +64,104 @@ class BookController extends Controller
             default => $query->orderBy('title'),
         };
 
-        $books = $query->paginate(12)->withQueryString();
-
+        $books = $query->orderBy('id')->paginate(12)->withQueryString();
         $totalBooks = Book::count();
-        $availableCount = Book::where('is_reference', false)
-            ->whereDoesntHave('members', fn ($q) => $q->whereNull('returned_at'))
-            ->count();
-        $referenceCount = Book::where('is_reference', true)->count();
-        $totalMembers = Member::count();
+        $availableCount = Book::available()->count();
 
-        // Count per subject category
-        $categoryCounts = [
-            'all' => $totalBooks,
-            'cs' => Book::whereHas('author', fn ($q) => $q->where('name', 'like', '%Martin%')->orWhere('name', 'like', '%Cormen%')->orWhere('name', 'like', '%Silberschatz%'))->count(),
-            'math' => Book::whereHas('author', fn ($q) => $q->where('name', 'like', '%Stewart%'))->count(),
-            'physics' => Book::whereHas('author', fn ($q) => $q->where('name', 'like', '%Young%'))->count(),
-            'biology' => Book::whereHas('author', fn ($q) => $q->where('name', 'like', '%Campbell%'))->count(),
-            'economics' => Book::whereHas('author', fn ($q) => $q->where('name', 'like', '%Mankiw%'))->count(),
-            'literature' => Book::whereHas('author', fn ($q) => $q->where('name', 'like', '%Fitzgerald%')->orWhere('name', 'like', '%Orwell%'))->count(),
-            'reference' => $referenceCount,
-        ];
-
-        // Active loans count for logged in member
-        $userActiveLoansCount = 0;
-        if (auth()->check() && auth()->user()->member) {
-            $userActiveLoansCount = auth()->user()->member->books()->wherePivotNull('returned_at')->count();
-        }
-
-        return view('books.index', compact(
-            'books',
-            'search',
-            'filter',
-            'category',
-            'sort',
-            'totalBooks',
-            'availableCount',
-            'referenceCount',
-            'totalMembers',
-            'categoryCounts',
-            'userActiveLoansCount'
-        ));
+        return view('books.index', compact('books', 'search', 'filter', 'category', 'sort', 'categories', 'totalBooks', 'availableCount'));
     }
 
-    /**
-     * Show form to create a new book (Librarians/Admins only).
-     */
-    public function create()
+    public function create(): View
     {
         Gate::authorize('create', Book::class);
 
-        $authors = Author::orderBy('name')->get();
-        $book = new Book(['published_year' => (int) date('Y'), 'is_reference' => false]);
-
-        return view('books.form', compact('book', 'authors'));
+        return view('books.form', [
+            'authors' => Author::orderBy('name')->get(),
+            'book' => new Book(['published_year' => now()->year, 'is_reference' => false]),
+        ]);
     }
 
-    /**
-     * Store a newly created book.
-     */
-    public function store(Request $request)
+    public function store(BookRequest $request): RedirectResponse
     {
         Gate::authorize('create', Book::class);
 
-        $validated = $request->validate([
-            'title' => ['required', 'string', 'max:255'],
-            'author_id' => ['required', 'exists:authors,id'],
-            'isbn' => ['required', 'string', 'size:13', 'unique:books,isbn'],
-            'published_year' => ['required', 'integer', 'between:1500,'.(date('Y') + 1)],
-            'is_reference' => ['boolean'],
-            'cover_path' => ['nullable', 'string', 'max:500'],
+        $book = Book::create([...$request->validated(), 'is_reference' => $request->boolean('is_reference')]);
+
+        return to_route('books.show', $book)->with('status', 'Book added to the catalogue.');
+    }
+
+    public function show(Book $book): View
+    {
+        Gate::authorize('view', $book);
+
+        $book->load('author')->loadCount([
+            'members as active_loans_count' => fn (Builder $loans): Builder => $loans->whereNull('returned_at'),
+            'members as loans_count',
         ]);
 
-        $validated['is_reference'] = $request->boolean('is_reference');
-
-        $book = Book::create($validated);
-
-        return redirect()->route('books.show', $book)
-            ->with('status', "Book '{$book->title}' has been added successfully.");
+        return view('books.show', [
+            'book' => $book,
+            'isBorrowed' => $book->isBorrowed(),
+            'isBorrowable' => $book->isBorrowable(),
+        ]);
     }
 
-    /**
-     * Display a specific book.
-     */
-    public function show(Book $book)
-    {
-        $book->load('author');
-        $isBorrowed = $book->isBorrowed();
-        $isBorrowable = $book->isBorrowable();
-
-        return view('books.show', compact('book', 'isBorrowed', 'isBorrowable'));
-    }
-
-    /**
-     * Show form to edit a book.
-     */
-    public function edit(Book $book)
+    public function edit(Book $book): View
     {
         Gate::authorize('update', $book);
 
-        $authors = Author::orderBy('name')->get();
-
-        return view('books.form', compact('book', 'authors'));
+        return view('books.form', ['book' => $book, 'authors' => Author::orderBy('name')->get()]);
     }
 
-    /**
-     * Update the specified book.
-     */
-    public function update(Request $request, Book $book)
+    public function update(BookRequest $request, Book $book): RedirectResponse
     {
         Gate::authorize('update', $book);
 
-        $validated = $request->validate([
-            'title' => ['required', 'string', 'max:255'],
-            'author_id' => ['required', 'exists:authors,id'],
-            'isbn' => ['required', 'string', 'size:13', 'unique:books,isbn,'.$book->id],
-            'published_year' => ['required', 'integer', 'between:1500,'.(date('Y') + 1)],
-            'is_reference' => ['boolean'],
-            'cover_path' => ['nullable', 'string', 'max:500'],
-        ]);
+        DB::transaction(function () use ($request, $book): void {
+            $lockedBook = Book::whereKey($book->id)->lockForUpdate()->firstOrFail();
 
-        $validated['is_reference'] = $request->boolean('is_reference');
+            if ($request->boolean('is_reference') && $lockedBook->isBorrowed()) {
+                throw ValidationException::withMessages(['is_reference' => 'Return the current loan before making this a reference book.']);
+            }
 
-        $book->update($validated);
+            $lockedBook->update([...$request->validated(), 'is_reference' => $request->boolean('is_reference')]);
+        });
 
-        return redirect()->route('books.show', $book)
-            ->with('status', 'Book details updated successfully.');
+        return to_route('books.show', $book)->with('status', 'Book details updated.');
     }
 
-    /**
-     * Delete a book.
-     */
-    public function destroy(Book $book)
+    public function destroy(Book $book): RedirectResponse
     {
         Gate::authorize('delete', $book);
 
-        // Cannot delete a book with active unreturned loans
-        if ($book->isBorrowed()) {
-            return back()->withErrors(['error' => 'Cannot delete a book that is currently on loan.']);
-        }
+        return DB::transaction(function () use ($book): RedirectResponse {
+            $lockedBook = Book::whereKey($book->id)->lockForUpdate()->firstOrFail();
 
-        $book->delete();
+            if ($lockedBook->members()->exists()) {
+                return back()->withErrors(['error' => 'Books with loan history cannot be deleted. Keep this record to preserve circulation history.']);
+            }
 
-        return redirect()->route('books.index')
-            ->with('status', 'Book removed from library catalogue.');
+            $lockedBook->delete();
+
+            return to_route('books.index')->with('status', 'Book removed from the catalogue.');
+        });
     }
 
-    /**
-     * Borrow action (attaches logged-in user's member record).
-     * Reference books cannot be borrowed.
-     */
-    public function borrow(Request $request, Book $book)
+    public function borrow(Request $request, Book $book): RedirectResponse
     {
-        $user = $request->user();
+        DB::transaction(function () use ($request, $book): void {
+            $lockedBook = Book::whereKey($book->id)->lockForUpdate()->firstOrFail();
+            abort_if($lockedBook->is_reference, 403, 'Reference books are for library use only.');
 
-        if (! $user) {
-            return redirect()->route('login');
-        }
+            if ($lockedBook->isBorrowed()) {
+                throw ValidationException::withMessages(['error' => 'This book is already on loan. Choose another available title.']);
+            }
 
-        // Must have a linked member record
-        $member = $user->member;
-        if (! $member) {
-            // Auto-create member record for logged in user if not yet present
-            $member = $user->member()->create([
-                'name' => $user->name,
-                'email' => $user->email,
-            ]);
-        }
+            $user = User::whereKey($request->user()->id)->lockForUpdate()->firstOrFail();
+            $member = $user->member()->firstOrCreate([], ['name' => $user->name, 'email' => $user->email]);
+            $member->books()->attach($lockedBook->id, ['borrowed_at' => now(), 'returned_at' => null]);
+        }, 3);
 
-        if ($book->is_reference) {
-            abort(403, 'Reference books cannot be borrowed.');
-        }
-
-        if ($book->isBorrowed()) {
-            return back()->withErrors(['error' => 'This book is currently borrowed by another member.']);
-        }
-
-        // Attach loan
-        $member->books()->attach($book->id, [
-            'borrowed_at' => now(),
-            'returned_at' => null,
-            'created_at' => now(),
-            'updated_at' => now(),
-        ]);
-
-        return redirect()->route('my.loans')
-            ->with('status', "You have successfully borrowed '{$book->title}'. Happy reading!");
+        return to_route('my.loans')->with('status', "You borrowed “{$book->title}”. Return it to the circulation desk by ".now()->addDays(14)->format('M j, Y').'.');
     }
 }
